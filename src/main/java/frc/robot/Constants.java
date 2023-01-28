@@ -43,17 +43,11 @@ public final class Constants {
 
         public static final String simpleAuto = "SimpleAuto";
 
-        public static final int turretID = 12;
-        public static final int floorID = 18;
-        public static final int intakeID = 20;
-        public static final int trasversalID = 19;
-        public static final int traveralMoveID = 17;
-        public static final int kickerID = 13;
-        public static final int leftShootID = 15;
-        public static final int rightShooterID = 14;
-        public static final int hoodID = 16;
-        public static final int rightClimb = 23;
-        public static final int leftClimb = 22;
+        // Motor IDs
+        public static final int armMoveID = 11;
+        public static final int armExtendID = 22;
+        public static final int wristID = 33;
+        public static final int vacuumID = 99;
 
         public final static double L = .5715;
         public final static double W = .5715;
@@ -101,7 +95,7 @@ public final class Constants {
                 public static final double maxAngularSpeedRadiansPerSecond = Math.PI;
                 public static final double maxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-                public static final double PIDXP = 0.0000007; //0.0000000008
+                public static final double PIDXP = 0.0000007; // 0.0000000008
                 public static final double PIDYP = 0.00000;
 
                 public static final double PIDXI = .000001;
@@ -110,7 +104,7 @@ public final class Constants {
                 public static final double PIDYI = .000001;
                 public static final double PIDYD = .0001;
 
-                public static final double thetaP = .005; //.005
+                public static final double thetaP = .005; // .005
                 public static final double thetaI = 0.0001;
                 public static final double thetaD = 0;
 
