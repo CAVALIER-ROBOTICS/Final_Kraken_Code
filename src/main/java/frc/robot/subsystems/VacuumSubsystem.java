@@ -18,11 +18,7 @@ public class VacuumSubsystem extends SubsystemBase {
   public VacuumSubsystem() {}
 
   public void setMotorVelocity(double x) {
-    if (x == 1) {
       vacuumMotor.set(ControlMode.Velocity, x);
-    } else if (x == 2) {
-      vacuumMotor.set(ControlMode.Position, x);
-    }
   }
 
   @Override

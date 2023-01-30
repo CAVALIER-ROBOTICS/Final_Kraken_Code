@@ -32,7 +32,6 @@ import frc.robot.commands.MatchApriltagCommand;
 import frc.robot.commands.VacuumCommand;
 import frc.robot.commands.ArmCommands.ArmAngleCommand;
 import frc.robot.commands.ArmCommands.ArmExtendCommand;
-import frc.robot.commands.ArmCommands.HoldArmExtendCommand;
 import frc.robot.commands.DriveCommands.FieldDriveCommand;
 import frc.robot.commands.DriveCommands.RobotDriveCommand;
 
