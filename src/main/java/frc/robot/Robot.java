@@ -165,6 +165,8 @@ public class Robot extends TimedRobot {
       if(PhotonVision.getAprilTags().size() > 0) {
         Pose3d pose = PhotonVision.getPose3dRelativeToAprilTag(targ);
 
+        SmartDashboard.putBoolean("Updating pose", pose != null);
+
         if(pose != null) {
          teehee.setRobotPose(pose.toPose2d());
         }

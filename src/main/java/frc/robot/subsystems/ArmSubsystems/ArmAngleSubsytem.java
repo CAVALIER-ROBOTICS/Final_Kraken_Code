@@ -18,33 +18,53 @@ import frc.robot.Constants;
 
 public class ArmAngleSubsytem extends SubsystemBase {
   /** Creates a new ArmAngle. */
-  public CANSparkMax angleMotor = new CANSparkMax(Constants.armMoveID, MotorType.kBrushless);
-  private RelativeEncoder angleEncoder = angleMotor.getEncoder();
-  private SparkMaxPIDController anglePID = angleMotor.getPIDController();
+  public CANSparkMax angleMotorLeft = new CANSparkMax(Constants.armAngle11ID, MotorType.kBrushless);
+  public CANSparkMax angleMotorRight = new CANSparkMax(Constants.armAngle22ID, MotorType.kBrushless);
+
+  private RelativeEncoder angleEncoderLeft = angleMotorLeft.getEncoder();
+  private RelativeEncoder angleEncoderRight = angleMotorRight.getEncoder();
+
+  private SparkMaxPIDController anglePIDLeft = angleMotorLeft.getPIDController();
+  private SparkMaxPIDController anglePIDRight = angleMotorRight.getPIDController();
   
   public ArmAngleSubsytem() {
-    angleMotor.restoreFactoryDefaults();
-    angleMotor.setIdleMode(IdleMode.kBrake);
-    angleMotor.setInverted(true); //I believe it should be inverted??
+    angleMotorLeft.restoreFactoryDefaults();
+    angleMotorLeft.setIdleMode(IdleMode.kBrake);
+    angleMotorLeft.setInverted(true); //I believe it should be inverted??
 
-    anglePID.setP(0.05);
-    anglePID.setI(0.01);
-    anglePID.setD(0.001);
+    angleMotorRight.restoreFactoryDefaults();
+    angleMotorRight.setIdleMode(IdleMode.kBrake);
+    angleMotorRight.setInverted(true); //I believe it should be inverted??
 
-    angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
-    angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
+    anglePIDLeft.setP(0.05);
+    anglePIDLeft.setI(0.01);
+    anglePIDLeft.setD(0.001);
+
+    anglePIDRight.setP(0.05);
+    anglePIDRight.setI(0.01);
+    anglePIDRight.setD(0.001);
+
+    angleMotorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
+    angleMotorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
+
+    angleMotorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
+    angleMotorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
   }
 
   public void setAngle(double x) {
-    angleMotor.setVoltage(x);
+    angleMotorLeft.setVoltage(x);
+    angleMotorRight.setVoltage(x);
   }
 
+  //average of both
   public double getVoltage() {
-    return angleMotor.getOutputCurrent();
+    return ( angleMotorLeft.getOutputCurrent() + angleMotorRight.getOutputCurrent() ) / 2;
   }
 
   public void setAnglePosition() {
-    anglePID.setReference(angleEncoder.getPosition(), CANSparkMax.ControlType.kPosition);
+    anglePIDLeft.setReference(angleEncoderLeft.getPosition(), CANSparkMax.ControlType.kPosition);
+    anglePIDRight.setReference(angleEncoderLeft.getPosition(), CANSparkMax.ControlType.kPosition);
+
   }
 
   @Override

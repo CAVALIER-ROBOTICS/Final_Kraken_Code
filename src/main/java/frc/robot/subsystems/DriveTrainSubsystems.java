@@ -50,8 +50,6 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
   SwerveModuleState[] states = Constants.m_kinematics.toSwerveModuleStates(chassisSpeeds);
   SwerveModulePosition[] positions = new SwerveModulePosition[4];
 
-  Field2d field = new Field2d();
-
   public static final double maxVelocityPerSecond = 6380.0 / 60.0 *
       SdsModuleConfigurations.MK4_L2.getDriveReduction() *
       SdsModuleConfigurations.MK4_L2.getWheelDiameter() * Math.PI;
@@ -60,7 +58,6 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
       Math.hypot(Constants.W / 2.0, Constants.L / 2.0);
 
   public DriveTrainSubsystems() {
-    SmartDashboard.putData("Field", field);
 
     // pidgey.setStatusFramePeriod(PigeonIMU_StatusFrame.RawStatus_4_Mag, 62200);
     // pidgey.setStatusFramePeriod(PigeonIMU_StatusFrame.BiasedStatus_6_Accel,
@@ -191,7 +188,7 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
     updatePositions();
     SwerveModuleState[] temp = invert(states);
     odo.update(pidgey.getRotation2d(), positions);
-    field.setRobotPose(getPose());
+
     // SmartDashboard.putString("Odo", ""+odo.getPoseMeters());
   }
 

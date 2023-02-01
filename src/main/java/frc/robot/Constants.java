@@ -44,10 +44,15 @@ public final class Constants {
         public static final String simpleAuto = "SimpleAuto";
 
         // Motor IDs
-        public static final int armMoveID = 11;
-        public static final int armExtendID = 22;
-        public static final int wristID = 33;
-        public static final int vacuumID = 99;
+        public static final int armAngle11ID = 11;
+        public static final int armAngle22ID = 22;
+
+        public static final int armExtendID = 33;
+        public static final int wristID = 44;
+
+        public static final int vacuum99ID = 99;
+        public static final int vacuum88ID = 88;
+        public static final int vacuum77ID = 77;
 
         public final static double L = .5715;
         public final static double W = .5715;

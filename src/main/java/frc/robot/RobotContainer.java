@@ -34,9 +34,13 @@ import frc.robot.commands.ArmCommands.ArmAngleCommand;
 import frc.robot.commands.ArmCommands.ArmExtendCommand;
 import frc.robot.commands.DriveCommands.FieldDriveCommand;
 import frc.robot.commands.DriveCommands.RobotDriveCommand;
-
+import frc.robot.commands.WristCommands.WristAngleCommand;
 import frc.robot.subsystems.DriveTrainSubsystems;
 import frc.robot.subsystems.VacuumSubsystem;
+import frc.robot.subsystems.WristSubsystem;
+// import frc.robot.subsystems.WristSubsystem;
+// import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
+// import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
 import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
 import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
 
@@ -62,16 +66,20 @@ public class RobotContainer {
   ArmAngleSubsytem armAngleSub = new ArmAngleSubsytem();
   ArmExtendSubsystem armExtendSub = new ArmExtendSubsystem();
 
+  WristSubsystem wristSub = new WristSubsystem();
+
   VacuumSubsystem vacuumSub = new VacuumSubsystem();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
+  
   public RobotContainer() {
+
     SmartDashboard.putNumber("Hood Angle input", 14);
     SmartDashboard.putNumber("RPM input", .2);
 
-    configureButtonBindings();
+    wristSub.setDefaultCommand(new WristAngleCommand(wristSub, operator::getLeftY));
 
     driveSub.setDefaultCommand(
     new FieldDriveCommand(
@@ -93,8 +101,8 @@ public class RobotContainer {
         armExtendSub,
         ()-> modifyAxis(operator.getRightY())));
 
-    armAngleSub.setDefaultCommand(new ArmAngleCommand(armAngleSub, ()-> operator.getRightY()*-10));
-    armExtendSub.setDefaultCommand(new ArmExtendCommand(armExtendSub, ()-> operator.getLeftY()*10));
+    // armAngleSub.setDefaultCommand(new ArmAngleCommand(armAngleSub, ()-> operator.getRightY()*-10));
+    // armExtendSub.setDefaultCommand(new ArmExtendCommand(armExtendSub, ()-> operator.getLeftY()*10));
 
     configureButtonBindings();
   }
