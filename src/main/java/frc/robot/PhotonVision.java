@@ -4,11 +4,15 @@
 
 package frc.robot;
 
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -18,10 +22,11 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
 public class PhotonVision {
-    static PhotonCamera c = new PhotonCamera("OV5647"); 
+    static PhotonCamera c = new PhotonCamera("OV5647");
 
     public static PhotonPipelineResult getResults() {
         return c.getLatestResult();
@@ -31,32 +36,21 @@ public class PhotonVision {
         return getResults().getTargets();
     }
 
-    public static PhotonTrackedTarget getBest() {
-        return getResults().getBestTarget();
+    public static PhotonTrackedTarget getBest(PhotonPipelineResult result) {
+        return result.getBestTarget();
     }
 
-    public static Pose3d getPose3dRelativeToAprilTag(PhotonPipelineResult results) {
-        if(results.hasTargets()) {
-            AprilTagFieldLayout layout;
+    public static Pose3d getPose3dRelativeToAprilTag(PhotonPipelineResult results, AprilTagFieldLayout layout) throws NoSuchElementException { 
+        PhotonTrackedTarget target = getBest(results);
 
-            try {
-                layout = (AprilTagFieldLayout.loadFromResource(".wpilib\\FieldAprilTag2023.json"));
-
-            } catch (IOException io) {
-                return null;
-            }
-
-            PhotonTrackedTarget target = getBest();
-
-
+        if(target != null) {
             Optional<Pose3d> pose = layout.getTagPose(target.getFiducialId());
             Pose3d poseBetter = pose.get();
 
-            return PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(), poseBetter,
-                Constants.CAMERA_TO_ROBOT);
-    }
-    else {
-        return null;
-    }
-}
+        return PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(), poseBetter, Constants.CAMERA_TO_ROBOT);
+        }
+        else {
+            return null;
+        }
+     }
 }

@@ -31,7 +31,7 @@ public class MatchApriltagCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    PhotonTrackedTarget bestTag = PhotonVision.getBest();
+    PhotonTrackedTarget bestTag = PhotonVision.getBest(PhotonVision.getResults());
 
     if (bestTag != null) {
       double adjustedYaw = Math.abs(bestTag.getYaw() - dSub.getYaw());

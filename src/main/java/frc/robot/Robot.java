@@ -5,10 +5,12 @@
 package frc.robot;
 
 import java.lang.reflect.Field;
+import java.util.NoSuchElementException;
 
 import javax.lang.model.util.ElementScanner14;
 
 import org.opencv.aruco.Aruco;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -16,8 +18,11 @@ import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
@@ -39,8 +44,10 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private Command autoBalance;
   private Command drive;
-  PhotonVision lol = new PhotonVision();
+  PhotonVision vision = new PhotonVision();
+  VisionConfig config = new VisionConfig();
   Field2d teehee = new Field2d();
+  AprilTagFieldLayout layout = new AprilTagFieldLayout(config.tagList, Units.inchesToMeters(651.25), Units.inchesToMeters(315.5));
 
   private RobotContainer robotContainer;
   // private final I2C.Port i2cport = I2C.Port.kOnboard;
@@ -158,22 +165,21 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    
-    PhotonPipelineResult targ = PhotonVision.getResults();
+    PhotonPipelineResult result = PhotonVision.getResults();
+    Pose3d pose;
 
     try {
-      if(PhotonVision.getAprilTags().size() > 0) {
-        Pose3d pose = PhotonVision.getPose3dRelativeToAprilTag(targ);
+       pose = PhotonVision.getPose3dRelativeToAprilTag(result, layout);
+       SmartDashboard.putBoolean("NoSuchElement", false);
+    } catch (NoSuchElementException e) {
+       SmartDashboard.putBoolean("NoSuchElement", true);
+       pose = null;
+    }
 
-        SmartDashboard.putBoolean("Updating pose", pose != null);
-
-        if(pose != null) {
-         teehee.setRobotPose(pose.toPose2d());
-        }
-      }
-     } catch(NullPointerException n) {} 
-
-
+    if(pose != null) {
+      teehee.setRobotPose(pose.toPose2d());
+      SmartDashboard.putData(teehee);
+    }
 
     // Color detectedColor = colorSensorV3.getColor();
     // String cString;
