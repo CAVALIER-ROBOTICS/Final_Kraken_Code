@@ -9,11 +9,11 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.WristSubsystem;
 
-public class WristAngleCommand extends CommandBase {
+public class WristAngleUpCommand extends CommandBase {
   WristSubsystem wristSub;
   DoubleSupplier dSupplier;
   /** Creates a new WristAngleCommand. */
-  public WristAngleCommand(WristSubsystem w, DoubleSupplier dubsup) {
+  public WristAngleUpCommand(WristSubsystem w, DoubleSupplier dubsup) {
     wristSub = w;
     dSupplier = dubsup;
     addRequirements(w);
@@ -27,7 +27,7 @@ public class WristAngleCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    wristSub.setWristAngle(180 * dSupplier.getAsDouble());
+    wristSub.setWrist(20);
   }
 
   // Called once the command ends or is interrupted.

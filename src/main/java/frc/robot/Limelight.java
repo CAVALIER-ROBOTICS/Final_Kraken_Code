@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Interpolation.InterpolatingTable;
 
 /** Add your docs here. */
-public class LimelightLol {
+public class Limelight {
     public static NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-cavbots");
 
     public static NetworkTableEntry tx = table.getEntry("tx");
@@ -18,7 +18,7 @@ public class LimelightLol {
     public static double y;
     public static double area;
     
-    public LimelightLol() {
+    public Limelight() {
         // table = NetworkTableInstance.getDefault().getTable("limelight-cavbots");
         // tx = table.getEntry("tx");
         // ty = table.getEntry("ty");

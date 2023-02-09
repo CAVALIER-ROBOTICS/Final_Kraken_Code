@@ -33,7 +33,8 @@ import frc.robot.commands.ArmCommands.ArmAngleCommand;
 import frc.robot.commands.ArmCommands.ArmExtendCommand;
 import frc.robot.commands.DriveCommands.FieldDriveCommand;
 import frc.robot.commands.DriveCommands.RobotDriveCommand;
-import frc.robot.commands.WristCommands.WristAngleCommand;
+import frc.robot.commands.WristCommands.WristAngleDownCommand;
+import frc.robot.commands.WristCommands.WristAngleUpCommand;
 import frc.robot.subsystems.DriveTrainSubsystems;
 import frc.robot.subsystems.VacuumSubsystem;
 import frc.robot.subsystems.WristSubsystem;
@@ -78,7 +79,7 @@ public class RobotContainer {
     SmartDashboard.putNumber("Hood Angle input", 14);
     SmartDashboard.putNumber("RPM input", .2);
 
-    wristSub.setDefaultCommand(new WristAngleCommand(wristSub, operator::getLeftY));
+    wristSub.setDefaultCommand(new WristAngleDownCommand(wristSub, operator::getLeftY));
 
     driveSub.setDefaultCommand(
     new FieldDriveCommand(
@@ -119,21 +120,20 @@ public class RobotContainer {
     JoystickButton reset = new JoystickButton(driver, 4);
     JoystickButton changeDrive = new JoystickButton(driver, 3);
 
-    JoystickButton vacuum = new JoystickButton(operator, 6);
+    // JoystickButton vacuum = new JoystickButton(operator, 6);
 
-    //simple version for now - DPAD
-    // Trigger armExtendOut = new Trigger(()-> getRightDPad());
-    // Trigger armExtendIn = new Trigger(()-> getLeftDPad());
-
-    // Trigger armAngleUp = new Trigger(()-> getUpDPad());
-    // Trigger armAngleDown = new Trigger(()-> getDownDPad());
+    JoystickButton wristUp = new JoystickButton(operator, 6);
+    JoystickButton wristDown = new JoystickButton(operator, 5);
 
     reset.whileTrue(new SequentialCommandGroup(
       new InstantCommand(driveSub::zeroGyroscope),
       new MatchApriltagCommand(driveSub)
     ));
 
-    vacuum.onTrue(new VacuumCommand(vacuumSub));
+    wristUp.onTrue(new WristAngleUpCommand(wristSub, null));
+    wristDown.onTrue(new WristAngleDownCommand(wristSub, null));
+
+    // vacuum.onTrue(new VacuumCommand(vacuumSub));
 
     changeDrive.toggleOnTrue(
         new FieldDriveCommand(
@@ -184,22 +184,6 @@ public class RobotContainer {
 
     // value = Math.copySign(value * value, value);
     return value;
-  }
-
-  private static boolean getUpDPad() {
-  return operator.getPOV() == 0;
-  }
-
-  private static boolean getRightDPad() {
-  return operator.getPOV() == 90;
-  }
-
-  private static boolean getDownDPad() {
-  return operator.getPOV() == 180;
-  }
-
-  private static boolean getLeftDPad() {
-  return operator.getPOV() == 270;
   }
 
   private static boolean getRightTrigger() {

@@ -30,10 +30,6 @@ public class WristSubsystem extends SubsystemBase {
     wristMotor.set(x);
   }
 
-  public void setWristVoltage(double x) {
-    wristMotor.setVoltage(x);
-  }
-
   public double getWristVoltage() {
     return wristMotor.getOutputCurrent();
   }
