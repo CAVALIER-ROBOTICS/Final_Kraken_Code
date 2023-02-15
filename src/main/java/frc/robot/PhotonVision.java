@@ -40,17 +40,30 @@ public class PhotonVision {
         return result.getBestTarget();
     }
 
-    public static Pose3d getPose3dRelativeToAprilTag(PhotonPipelineResult results, AprilTagFieldLayout layout) throws NoSuchElementException { 
-        PhotonTrackedTarget target = getBest(results);
+    private static AprilTagFieldLayout getLayout() {
+        try {
+            return (AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile));
 
-        if(target != null) {
-            Optional<Pose3d> pose = layout.getTagPose(target.getFiducialId());
-            Pose3d poseBetter = pose.get();
-
-        return PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(), poseBetter, Constants.CAMERA_TO_ROBOT);
-        }
-        else {
+        } catch (IOException io) {
+            System.out.println("IO exception rn");
             return null;
         }
-     }
+    }
+
+    public static Pose3d getPose3dRelativeToAprilTag(PhotonPipelineResult results, AprilTagFieldLayout layout)
+            throws NoSuchElementException {
+
+        AprilTagFieldLayout fieldLayout = getLayout();
+        PhotonTrackedTarget target = getBest(results);
+
+        if (target != null) {
+            Optional<Pose3d> pose = fieldLayout.getTagPose(target.getFiducialId());
+            Pose3d poseBetter = pose.get();
+
+            return PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(), poseBetter,
+                    Constants.CAMERA_TO_ROBOT);
+        } else {
+            return null;
+        }
+    }
 }

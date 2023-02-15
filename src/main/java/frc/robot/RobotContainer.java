@@ -28,21 +28,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ABV2Command;
 import frc.robot.commands.MatchApriltagCommand;
-import frc.robot.commands.VacuumCommand;
-import frc.robot.commands.ArmCommands.ArmAngleCommand;
-import frc.robot.commands.ArmCommands.ArmExtendCommand;
 import frc.robot.commands.DriveCommands.FieldDriveCommand;
 import frc.robot.commands.DriveCommands.RobotDriveCommand;
-import frc.robot.commands.WristCommands.WristAngleDownCommand;
-import frc.robot.commands.WristCommands.WristAngleUpCommand;
+
 import frc.robot.subsystems.DriveTrainSubsystems;
-import frc.robot.subsystems.VacuumSubsystem;
-import frc.robot.subsystems.WristSubsystem;
-// import frc.robot.subsystems.WristSubsystem;
-// import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
-// import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
-import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
-import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -63,46 +52,28 @@ public class RobotContainer {
 
   PathPlannerTrajectory path;
 
-  ArmAngleSubsytem armAngleSub = new ArmAngleSubsytem();
-  ArmExtendSubsystem armExtendSub = new ArmExtendSubsystem();
+  Trigger leftClimbDown = new Trigger(() -> getLeftTrigger());
+  Trigger rightClimbDown = new Trigger(() -> getRightTrigger());
 
-  WristSubsystem wristSub = new WristSubsystem();
-
-  VacuumSubsystem vacuumSub = new VacuumSubsystem();
+  Trigger leftClimbUp = new Trigger(() -> getOperatorLeftBumper());
+  Trigger rightClimbUp = new Trigger(() -> getOperatorRightBumper());
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-  
   public RobotContainer() {
-
     SmartDashboard.putNumber("Hood Angle input", 14);
     SmartDashboard.putNumber("RPM input", .2);
 
-    wristSub.setDefaultCommand(new WristAngleDownCommand(wristSub, operator::getLeftY));
-
     driveSub.setDefaultCommand(
-    new FieldDriveCommand(
-    () -> modifyAxis(driver.getLeftY() *
-    DriveTrainSubsystems.maxVelocityPerSecond),
-    () -> modifyAxis(driver.getLeftX() *
-    DriveTrainSubsystems.maxVelocityPerSecond),
-    () -> modifyAxis(driver.getRightX() *
-    DriveTrainSubsystems.maxAnglarVelocityPerSecond),
-    driveSub));
-
-    armAngleSub.setDefaultCommand(
-      new ArmAngleCommand(
-        armAngleSub, 
-        ()-> modifyAxis(operator.getLeftY())));
-
-    armExtendSub.setDefaultCommand(
-      new ArmExtendCommand(
-        armExtendSub,
-        ()-> modifyAxis(operator.getRightY())));
-
-    // armAngleSub.setDefaultCommand(new ArmAngleCommand(armAngleSub, ()-> operator.getRightY()*-10));
-    // armExtendSub.setDefaultCommand(new ArmExtendCommand(armExtendSub, ()-> operator.getLeftY()*10));
+        new FieldDriveCommand(
+            () -> modifyAxis(driver.getLeftY() *
+                DriveTrainSubsystems.maxVelocityPerSecond),
+            () -> modifyAxis(driver.getLeftX() *
+                DriveTrainSubsystems.maxVelocityPerSecond),
+            () -> modifyAxis(driver.getRightX() *
+                DriveTrainSubsystems.maxAnglarVelocityPerSecond),
+            driveSub));
 
     configureButtonBindings();
   }
@@ -120,20 +91,9 @@ public class RobotContainer {
     JoystickButton reset = new JoystickButton(driver, 4);
     JoystickButton changeDrive = new JoystickButton(driver, 3);
 
-    // JoystickButton vacuum = new JoystickButton(operator, 6);
-
-    JoystickButton wristUp = new JoystickButton(operator, 6);
-    JoystickButton wristDown = new JoystickButton(operator, 5);
-
     reset.whileTrue(new SequentialCommandGroup(
-      new InstantCommand(driveSub::zeroGyroscope),
-      new MatchApriltagCommand(driveSub)
-    ));
-
-    wristUp.onTrue(new WristAngleUpCommand(wristSub, null));
-    wristDown.onTrue(new WristAngleDownCommand(wristSub, null));
-
-    // vacuum.onTrue(new VacuumCommand(vacuumSub));
+        new InstantCommand(driveSub::zeroGyroscope),
+        new MatchApriltagCommand(driveSub)));
 
     changeDrive.toggleOnTrue(
         new FieldDriveCommand(
@@ -159,10 +119,9 @@ public class RobotContainer {
 
   public Command getAutonCommand() {
     return new SequentialCommandGroup(
-      new InstantCommand(driveSub::zeroGyroscope),
-      auto.loadPls(),
-      new InstantCommand(driveSub::stop)
-    );
+        new InstantCommand(driveSub::zeroGyroscope),
+        auto.loadPls(),
+        new InstantCommand(driveSub::stop));
   }
 
   private static double deadband(double value, double deadband) {
@@ -185,6 +144,22 @@ public class RobotContainer {
     // value = Math.copySign(value * value, value);
     return value;
   }
+
+  // private static boolean getUpDPad() {
+  // return operator.getPOV() == 0;
+  // }
+
+  // private static boolean getRightDPad() {
+  // return operator.getPOV() == 90;
+  // }
+
+  // private static boolean getDownDPad() {
+  // return operator.getPOV() == 180;
+  // }
+
+  // private static boolean getLeftDPad() {
+  // return operator.getPOV() == 270;
+  // }
 
   private static boolean getRightTrigger() {
     return driver.getRightTriggerAxis() > 0.05;

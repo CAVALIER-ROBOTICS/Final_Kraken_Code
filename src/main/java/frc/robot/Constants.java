@@ -5,12 +5,21 @@
 package frc.robot;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.photonvision.PhotonCamera;
 
 import com.pathplanner.lib.PathConstraints;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -38,21 +47,22 @@ public final class Constants {
                         "FourBallPath2"
         };
 
+     
         public static final double WHEELRADMM = (3.9 * 2.54) / 2;
-        public static final Transform3d CAMERA_TO_ROBOT = new Transform3d();
+        public static final Transform3d CAMERA_TO_ROBOT = new Transform3d(new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)), new Pose3d(0.0, .762, 0.0, new Rotation3d()));
 
         public static final String simpleAuto = "SimpleAuto";
 
-        // Motor IDs
-        public static final int armAngle11ID = 11;
-        public static final int armAngle22ID = 22;
-
-        public static final int armExtendID = 33;
         public static final int wristID = 44;
 
         public static final int vacuum99ID = 99;
         public static final int vacuum88ID = 88;
         public static final int vacuum77ID = 77;
+
+        public static final int armExtendID = 33;
+        
+        public static final int armAngle11ID = 11;
+        public static final int armAngle22ID = 22;
 
         public final static double L = .5715;
         public final static double W = .5715;
@@ -100,7 +110,7 @@ public final class Constants {
                 public static final double maxAngularSpeedRadiansPerSecond = Math.PI;
                 public static final double maxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-                public static final double PIDXP = 0.0000007; // 0.0000000008
+                public static final double PIDXP = 0.0000007; //0.0000000008
                 public static final double PIDYP = 0.00000;
 
                 public static final double PIDXI = .000001;
@@ -109,7 +119,7 @@ public final class Constants {
                 public static final double PIDYI = .000001;
                 public static final double PIDYD = .0001;
 
-                public static final double thetaP = .005; // .005
+                public static final double thetaP = .005; //.005
                 public static final double thetaI = 0.0001;
                 public static final double thetaD = 0;
 
@@ -118,4 +128,5 @@ public final class Constants {
                                 maxAngularSpeedRadiansPerSecond, maxAngularSpeedRadiansPerSecondSquared);
                 public static final double maxAccelerationMetersPerSecond = 0;
         }
+
 }
