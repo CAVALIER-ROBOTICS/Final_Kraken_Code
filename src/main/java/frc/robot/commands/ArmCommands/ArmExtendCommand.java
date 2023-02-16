@@ -4,6 +4,7 @@
 
 package frc.robot.commands.ArmCommands;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -12,9 +13,9 @@ import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
 public class ArmExtendCommand extends CommandBase {
   /** Creates a new ArmAngleCommand. */
   ArmExtendSubsystem armExtendSub;
-  DoubleSupplier dubsup;
+  BooleanSupplier dubsup;
 
-  public ArmExtendCommand(ArmExtendSubsystem a, DoubleSupplier d) {
+  public ArmExtendCommand(ArmExtendSubsystem a, BooleanSupplier d) {
     // Use addRequirements() here to declare subsystem dependencies.
     armExtendSub = a;
     dubsup = d;
@@ -28,20 +29,27 @@ public class ArmExtendCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (dubsup.getAsDouble() > 0.25 || dubsup.getAsDouble() < -0.25) {
-      armExtendSub.setExtend(dubsup.getAsDouble());
+    if(!dubsup.getAsBoolean()) {
+      armExtendSub.setExtend(.4);
     } else {
-      armExtendSub.setArmExtensionPosition();
+      armExtendSub.setExtend(-.4);
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    armExtendSub.setExtend(0.0);
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    Boolean shouldNegate = dubsup.getAsBoolean();
+    if(!shouldNegate) {
+      return armExtendSub.getIsAtHigh();
+    } else {
+      return armExtendSub.getIsAtLow();
+    }
   }
 }

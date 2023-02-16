@@ -28,10 +28,14 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ABV2Command;
 import frc.robot.commands.MatchApriltagCommand;
+import frc.robot.commands.VacuumCommand;
+import frc.robot.commands.ArmCommands.ArmExtendCommand;
 import frc.robot.commands.DriveCommands.FieldDriveCommand;
 import frc.robot.commands.DriveCommands.RobotDriveCommand;
 
 import frc.robot.subsystems.DriveTrainSubsystems;
+import frc.robot.subsystems.VacuumSubsystem;
+import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -49,14 +53,13 @@ public class RobotContainer {
 
   DriveTrainSubsystems driveSub = new DriveTrainSubsystems();
   DriveAuto auto = new DriveAuto(driveSub);
+  VacuumSubsystem vacSub = new VacuumSubsystem();
+  ArmExtendSubsystem armextSub = new ArmExtendSubsystem();
 
   PathPlannerTrajectory path;
 
-  Trigger leftClimbDown = new Trigger(() -> getLeftTrigger());
-  Trigger rightClimbDown = new Trigger(() -> getRightTrigger());
-
-  Trigger leftClimbUp = new Trigger(() -> getOperatorLeftBumper());
-  Trigger rightClimbUp = new Trigger(() -> getOperatorRightBumper());
+  Trigger vacTrigger = new Trigger(() -> getRightTrigger(driver));
+  Trigger armextTrigger = new Trigger(() -> getRightTrigger(operator));
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -75,6 +78,7 @@ public class RobotContainer {
                 DriveTrainSubsystems.maxAnglarVelocityPerSecond),
             driveSub));
 
+    
     configureButtonBindings();
   }
 
@@ -90,6 +94,9 @@ public class RobotContainer {
 
     JoystickButton reset = new JoystickButton(driver, 4);
     JoystickButton changeDrive = new JoystickButton(driver, 3);
+  
+    vacTrigger.whileTrue(new VacuumCommand(vacSub));
+    armextTrigger.whileTrue(new ArmExtendCommand(armextSub, () -> getShouldNegate(operator)));
 
     reset.whileTrue(new SequentialCommandGroup(
         new InstantCommand(driveSub::zeroGyroscope),
@@ -161,12 +168,16 @@ public class RobotContainer {
   // return operator.getPOV() == 270;
   // }
 
-  private static boolean getRightTrigger() {
-    return driver.getRightTriggerAxis() > 0.05;
+  private static boolean getRightTrigger(XboxController controller) {
+    return controller.getRightTriggerAxis() > 0.05;
   }
 
-  private static boolean getLeftTrigger() {
-    return driver.getLeftTriggerAxis() > 0.05;
+  private static boolean getShouldNegate(XboxController controller) {
+    return controller.getRightTriggerAxis() < controller.getLeftTriggerAxis();
+  }
+
+  private static boolean getLeftTrigger(XboxController controller) {
+    return controller.getLeftTriggerAxis() > 0.05;
   }
 
   private static boolean getOperatorLeftBumper() {

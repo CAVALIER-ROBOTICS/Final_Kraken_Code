@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -20,6 +21,8 @@ public class ArmExtendSubsystem extends SubsystemBase {
   public CANSparkMax extendMotor = new CANSparkMax(Constants.armExtendID, MotorType.kBrushless);
   private RelativeEncoder extendEncoder = extendMotor.getEncoder();
   private SparkMaxPIDController extendPID = extendMotor.getPIDController();
+  DigitalInput highExtremeDigitalInput = new DigitalInput(0);
+  DigitalInput lowExtremeDigitalInput = new DigitalInput(1);
   
   public ArmExtendSubsystem() {
     extendMotor.restoreFactoryDefaults();
@@ -43,8 +46,14 @@ public class ArmExtendSubsystem extends SubsystemBase {
   public void setArmExtensionPosition() {
     extendPID.setReference(extendEncoder.getPosition(), ControlType.kPosition);
   }
+  public boolean getIsAtHigh() {
+    return highExtremeDigitalInput.get();
+  }
 
-
+  public boolean getIsAtLow() {
+    return lowExtremeDigitalInput.get();
+  }
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

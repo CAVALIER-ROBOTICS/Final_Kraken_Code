@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.VacuumSubsystem;
@@ -12,7 +14,7 @@ public class VacuumCommand extends CommandBase {
   /** Creates a new VacuumCommand. */
   VacuumSubsystem vacuumSub;
 
-  public VacuumCommand(VacuumSubsystem v) {
+  public VacuumCommand(VacuumSubsystem v ) {
     // Use addRequirements() here to declare subsystem dependencies.
     vacuumSub = v;
     addRequirements(v);
@@ -26,6 +28,7 @@ public class VacuumCommand extends CommandBase {
   @Override
   public void execute() {
     vacuumSub.setMotorVelocity(15000); //can change with how much suction neccessary
+
   }
 
   // Called once the command ends or is interrupted.
