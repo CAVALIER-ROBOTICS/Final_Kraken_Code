@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -44,10 +45,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private Command autoBalance;
   private Command drive;
-  PhotonVision vision = new PhotonVision();
-  VisionConfig config = new VisionConfig();
-  Field2d teehee = new Field2d();
-  AprilTagFieldLayout layout = new AprilTagFieldLayout(config.tagList, Units.inchesToMeters(651.25), Units.inchesToMeters(315.5));
 
   private RobotContainer robotContainer;
   // private final I2C.Port i2cport = I2C.Port.kOnboard;
@@ -100,7 +97,7 @@ public class Robot extends TimedRobot {
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    robotContainer.updateOdometry();
+    // robotContainer.updateOdometry();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -110,6 +107,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    ArmAngleSubsytem armAngleSubsytem = robotContainer.getArmAngleSub();
+    armAngleSubsytem.stopArm();
   }
 
   /**
@@ -119,9 +118,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // robotContainer.resetOdo();
-
-    autoBalance = robotContainer.getBalanceAuto();
-    drive = robotContainer.getAutonCommand();
 
     // if (autoBalance != null) {
     // autoBalance.schedule();
@@ -165,22 +161,6 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    PhotonPipelineResult result = PhotonVision.getResults();
-    Pose3d pose;
-
-    try {
-       pose = PhotonVision.getPose3dRelativeToAprilTag(result, layout);
-       SmartDashboard.putBoolean("NoSuchElement", false);
-    } catch (NoSuchElementException e) {
-       SmartDashboard.putBoolean("NoSuchElement", true);
-       pose = null;
-    }
-
-    if(pose != null) {
-      teehee.setRobotPose(pose.toPose2d());
-      SmartDashboard.putData(teehee);
-    }
-
     // Color detectedColor = colorSensorV3.getColor();
     // String cString;
     // ColorMatchResult matchResult = cMatch.matchClosestColor(detPectedColor);

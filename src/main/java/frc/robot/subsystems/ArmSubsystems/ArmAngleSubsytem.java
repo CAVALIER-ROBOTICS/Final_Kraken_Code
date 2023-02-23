@@ -5,6 +5,7 @@
 package frc.robot.subsystems.ArmSubsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.EncoderType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -12,6 +13,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -26,50 +29,65 @@ public class ArmAngleSubsytem extends SubsystemBase {
 
   private SparkMaxPIDController anglePIDLeft = angleMotorLeft.getPIDController();
   private SparkMaxPIDController anglePIDRight = angleMotorRight.getPIDController();
-  
+
   public ArmAngleSubsytem() {
-    angleMotorLeft.restoreFactoryDefaults();
-    angleMotorLeft.setIdleMode(IdleMode.kBrake);
-    angleMotorLeft.setInverted(true); //I believe it should be inverted??
+    // angleMotorLeft.restoreFactoryDefaults();
+    // angleMotorLeft.setIdleMode(IdleMode.kBrake);
 
-    angleMotorRight.restoreFactoryDefaults();
-    angleMotorRight.setIdleMode(IdleMode.kBrake);
-    angleMotorRight.setInverted(true); //I believe it should be inverted??
+    // angleMotorRight.restoreFactoryDefaults();
+    // angleMotorRight.setIdleMode(IdleMode.kBrake);
 
-    anglePIDLeft.setP(0.05);
-    anglePIDLeft.setI(0.01);
-    anglePIDLeft.setD(0.001);
+    anglePIDLeft.setP(1.5); //IT JUST WORKS 1.5, .01, .075
+    anglePIDLeft.setI(.01);
+    anglePIDLeft.setD(.075);
+    // angleMotorLeft.setInverted(true);
+    // angleMotorRight.setInverted(false);
 
-    anglePIDRight.setP(0.05);
-    anglePIDRight.setI(0.01);
-    anglePIDRight.setD(0.001);
+    // anglePIDRight.setP(.2);
+    // anglePIDRight.setI(0);
+    // anglePIDRight.setD(0);
 
-    angleMotorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
-    angleMotorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
-
-    angleMotorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
-    angleMotorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
+    angleMotorRight.follow(angleMotorLeft, true);
   }
 
-  public void setAngle(double x) {
+  public void setVoltage(double x) {
     angleMotorLeft.setVoltage(x);
-    angleMotorRight.setVoltage(x);
+    // angleMotorRight.setVoltage(x);
   }
 
-  //average of both
+  // average of both
   public double getVoltage() {
-    return ( angleMotorLeft.getOutputCurrent() + angleMotorRight.getOutputCurrent() ) / 2;
+    return (angleMotorLeft.getOutputCurrent() + angleMotorRight.getOutputCurrent()) / 2;
   }
 
-  public void setAnglePosition() {
-    anglePIDLeft.setReference(angleEncoderLeft.getPosition(), CANSparkMax.ControlType.kPosition);
-    anglePIDRight.setReference(angleEncoderLeft.getPosition(), CANSparkMax.ControlType.kPosition);
+  public void setAnglePosition(double setpoint) {
+    double encoderRot = setpoint / 360 * 50;
+    anglePIDLeft.setReference(encoderRot, CANSparkMax.ControlType.kPosition);
+    // anglePIDRight.setReference(encoderRot, CANSparkMax.ControlType.kPosition);
 
+  }
+
+  public void setPercentage(double percent) {
+    angleMotorLeft.set(percent);
+    // angleMotorRight.set(-percent);
+  }
+
+  public void stopArm() {
+    anglePIDLeft.setReference(angleEncoderLeft.getPosition(), CANSparkMax.ControlType.kPosition);
+  }
+
+  public void resetEncoder() {
+    angleEncoderLeft.setPosition(0.0);
+  }
+
+  public void stopLoop() {
+    angleMotorLeft.set(0.0);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Arm Angle Output:", getVoltage());
+    SmartDashboard.putNumber("Encoder pos", angleEncoderLeft.getPosition());
   }
 }

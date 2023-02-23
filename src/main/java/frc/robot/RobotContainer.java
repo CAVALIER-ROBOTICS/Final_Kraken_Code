@@ -26,12 +26,19 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.ABV2Command;
-import frc.robot.commands.MatchApriltagCommand;
+
 import frc.robot.commands.DriveCommands.FieldDriveCommand;
 import frc.robot.commands.DriveCommands.RobotDriveCommand;
-
+import frc.robot.commands.DriveCommands.TestMotorCommand;
+import frc.robot.commands.DriveCommands.ArmCommands.ArmAngleCommand;
+import frc.robot.commands.DriveCommands.ArmCommands.ArmInCommand;
+import frc.robot.commands.DriveCommands.ArmCommands.ArmOutCOmmand;
+import frc.robot.commands.DriveCommands.WristCommands.WristCommand;
 import frc.robot.subsystems.DriveTrainSubsystems;
+import frc.robot.subsystems.TestMotorSub;
+import frc.robot.subsystems.WristSub;
+import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
+import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -48,15 +55,20 @@ public class RobotContainer {
   public static XboxController operator = new XboxController(1);
 
   DriveTrainSubsystems driveSub = new DriveTrainSubsystems();
-  DriveAuto auto = new DriveAuto(driveSub);
+  ArmAngleSubsytem armAngleSub = new ArmAngleSubsytem();
+  ArmExtendSubsystem armExtendSub = new ArmExtendSubsystem();
+  TestMotorSub testSub = new TestMotorSub();
+
+  WristSub wristSubsystem = new WristSub();
 
   PathPlannerTrajectory path;
 
-  Trigger leftClimbDown = new Trigger(() -> getLeftTrigger());
-  Trigger rightClimbDown = new Trigger(() -> getRightTrigger());
+  // Trigger vacTrigger = new Trigger(() -> getRightTrigger(driver));
+  // Trigger armextTrigger = new Trigger(() -> getRightTrigger(operator));
 
-  Trigger leftClimbUp = new Trigger(() -> getOperatorLeftBumper());
-  Trigger rightClimbUp = new Trigger(() -> getOperatorRightBumper());
+  Trigger armOut = new Trigger(() -> getRightTrigger(operator));
+  Trigger armIn = new Trigger(() -> getLeftTrigger(operator));
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -65,16 +77,17 @@ public class RobotContainer {
     SmartDashboard.putNumber("Hood Angle input", 14);
     SmartDashboard.putNumber("RPM input", .2);
 
-    driveSub.setDefaultCommand(
-        new FieldDriveCommand(
-            () -> modifyAxis(driver.getLeftY() *
-                DriveTrainSubsystems.maxVelocityPerSecond),
-            () -> modifyAxis(driver.getLeftX() *
-                DriveTrainSubsystems.maxVelocityPerSecond),
-            () -> modifyAxis(driver.getRightX() *
-                DriveTrainSubsystems.maxAnglarVelocityPerSecond),
-            driveSub));
+    // driveSub.setDefaultCommand(
+    //     new RobotDriveCommand(
+    //         () -> modifyAxis(driver.getLeftY() *
+    //             DriveTrainSubsystems.maxVelocityPerSecond),
+    //         () -> modifyAxis(driver.getLeftX() *
+    //             DriveTrainSubsystems.maxVelocityPerSecond),
+    //         () -> modifyAxis(driver.getRightX() *
+    //             DriveTrainSubsystems.maxAnglarVelocityPerSecond),
+    //         driveSub));
 
+    
     configureButtonBindings();
   }
 
@@ -88,41 +101,44 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
-    JoystickButton reset = new JoystickButton(driver, 4);
+    // JoystickButton reset = new JoystickButton(driver, 4);
     JoystickButton changeDrive = new JoystickButton(driver, 3);
+    JoystickButton driveForward = new JoystickButton(driver, 1);
+    JoystickButton resetGyro = new JoystickButton(driver, 4);
 
-    reset.whileTrue(new SequentialCommandGroup(
-        new InstantCommand(driveSub::zeroGyroscope),
-        new MatchApriltagCommand(driveSub)));
+    armAngleSub.setDefaultCommand(new ArmAngleCommand(armAngleSub, operator::getRightY));
+    resetGyro.whileTrue(new InstantCommand(driveSub::zeroGyroscope));
 
+    armOut.whileTrue(new ArmOutCOmmand(armExtendSub));
+    armIn.whileTrue(new ArmInCommand(armExtendSub));
+
+    wristSubsystem.setDefaultCommand(new WristCommand(wristSubsystem, operator::getLeftY));
+  
     changeDrive.toggleOnTrue(
         new FieldDriveCommand(
             () -> modifyAxis(driver.getRawAxis(1)),
             () -> modifyAxis(driver.getRawAxis(0)),
             () -> modifyAxis(driver.getRawAxis(4)),
             driveSub));
+
+    // vacTrigger.whileTrue(new ArmExtendCommand(armExtendSub, () -> getShouldNegate(driver)));
+
+    
+    
+   // driveForward.whileTrue(new InstantCommand( () -> driveSub.drive(new ChassisSpeeds(0, 10, 0))));
   }
 
-  public void resetOdo() {
-    driveSub.resetOdometry(path.getInitialPose());
-  }
 
-  public void updateOdometry() {
-    driveSub.updateOdo();
-  }
 
-  public Command getBalanceAuto() {
-    return new SequentialCommandGroup(
-        new InstantCommand(driveSub::zeroGyroscope),
-        new ABV2Command(driveSub));
-  }
+  // public void resetOdo() {
+  //   driveSub.resetOdometry(path.getInitialPose());
+  // }
 
-  public Command getAutonCommand() {
-    return new SequentialCommandGroup(
-        new InstantCommand(driveSub::zeroGyroscope),
-        auto.loadPls(),
-        new InstantCommand(driveSub::stop));
-  }
+  // public void updateOdometry() {
+  //   driveSub.updateOdo();
+  // }
+
+
 
   private static double deadband(double value, double deadband) {
     if (Math.abs(value) > deadband) {
@@ -161,12 +177,20 @@ public class RobotContainer {
   // return operator.getPOV() == 270;
   // }
 
-  private static boolean getRightTrigger() {
-    return driver.getRightTriggerAxis() > 0.05;
+  private static boolean getRightTrigger(XboxController controller) {
+    return controller.getRightTriggerAxis() > 0.05;
   }
 
-  private static boolean getLeftTrigger() {
-    return driver.getLeftTriggerAxis() > 0.05;
+  public ArmAngleSubsytem getArmAngleSub() {
+    return armAngleSub;
+  }
+
+  private static boolean getShouldNegate(XboxController controller) {
+    return controller.getRightTriggerAxis() < controller.getLeftTriggerAxis();
+  }
+
+  private static boolean getLeftTrigger(XboxController controller) {
+    return controller.getLeftTriggerAxis() > 0.05;
   }
 
   private static boolean getOperatorLeftBumper() {

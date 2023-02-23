@@ -28,7 +28,7 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
   /** Creates a new DriveTrainSubsystems. */
 
   // search up Pigeon IMU for more info
-  WPI_Pigeon2 pidgey = new WPI_Pigeon2(pigeonID, "Drivebase");
+  WPI_Pigeon2 pidgey = new WPI_Pigeon2(pigeonID, "OTHERCANIVORE");
   // Odometry class for tracking robot pose
   // Rotation2d.fromDegrees(getFusedHeading()); getRotation2d()
   // Rotation2d.fromDegrees(pidgey.getCompassHeading()
@@ -67,7 +67,7 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
 
     frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(
         // This can either be STANDARD or FAST depending on your gear configuration
-        Mk4SwerveModuleHelper.GearRatio.L2,
+        Mk4SwerveModuleHelper.GearRatio.L3,
         // This is the ID of the drive motor
         frontLeftDriveMotor,
         // This is the ID of the steer motor
@@ -79,14 +79,14 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
         frontLeftModuleSteerOffset);
 
     frontRightModule = Mk4SwerveModuleHelper.createFalcon500(
-        Mk4SwerveModuleHelper.GearRatio.L2,
+        Mk4SwerveModuleHelper.GearRatio.L3,
         frontRightDriveMotor,
         frontRightSteerMotor,
         frontRightSteerEncoder,
         frontRightModuleSteerOffset);
 
     backLeftModule = Mk4SwerveModuleHelper.createFalcon500(
-        Mk4SwerveModuleHelper.GearRatio.L2,
+        Mk4SwerveModuleHelper.GearRatio.L3,
         backLeftDriveMotor,
         backLeftSteerMotor,
         backLeftSteerEncoder,
@@ -94,7 +94,7 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
 
     backRightModule = Mk4SwerveModuleHelper.createFalcon500(
         // Shuffleboard.getTab("SwerveData").getLayout("SwerveData"),
-        Mk4SwerveModuleHelper.GearRatio.L2,
+        Mk4SwerveModuleHelper.GearRatio.L3,
         backRightDriveMotor,
         backRightSteerMotor,
         backRightSteerEncoder,
@@ -153,6 +153,10 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("BackRight", backRightModule.getSteerAngle());
+    SmartDashboard.putNumber("BackLeft", backLeftModule.getSteerAngle());
+    SmartDashboard.putNumber("FrontRight", frontRightModule.getSteerAngle());
+    SmartDashboard.putNumber("FrontLeft", frontLeftModule.getSteerAngle());
   }
 
   public SwerveModuleState[] invert(SwerveModuleState[] x) {

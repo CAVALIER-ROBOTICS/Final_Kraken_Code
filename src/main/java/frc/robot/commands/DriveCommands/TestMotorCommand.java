@@ -2,27 +2,35 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.DriveCommands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.TestMotorSub;
 
-public class AutonCommand extends CommandBase {
-  /** Creates a new AutonCommand. */
-  public AutonCommand() {
+public class TestMotorCommand extends CommandBase {
+  TestMotorSub testSub;
+  /** Creates a new TestMotorCommand. */
+  public TestMotorCommand(TestMotorSub tSub) {
+    testSub = tSub;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    testSub.set(.5);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    testSub.set(0.0);
+  }
 
   // Returns true when the command should end.
   @Override

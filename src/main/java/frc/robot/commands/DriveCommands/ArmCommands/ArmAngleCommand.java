@@ -2,25 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.DriveCommands.ArmCommands;
 
-import org.photonvision.targeting.PhotonTrackedTarget;
+import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.PhotonVision;
-import frc.robot.subsystems.DriveTrainSubsystems;
+import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
 
-public class MatchApriltagCommand extends CommandBase {
-  PIDController controller = new PIDController(.09, 0, 0);
-  /** Creates a new MatchApriltagCommand. */
-  DriveTrainSubsystems dSub;
+public class ArmAngleCommand extends CommandBase {
+  /** Creates a new ArmAngleCommand. */
+  ArmAngleSubsytem armAngleSub;
+  DoubleSupplier dubsup;
 
-  public MatchApriltagCommand(DriveTrainSubsystems d) {
-    dSub = d;
-    addRequirements(dSub);
+  public ArmAngleCommand(ArmAngleSubsytem a, DoubleSupplier d) {
     // Use addRequirements() here to declare subsystem dependencies.
+    armAngleSub = a;
+    dubsup = d;
+    addRequirements(a);
   }
 
   // Called when the command is initially scheduled.
@@ -31,14 +30,17 @@ public class MatchApriltagCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    PhotonTrackedTarget bestTag = PhotonVision.getBest(PhotonVision.getResults());
-
-    if (bestTag != null) {
-      double adjustedYaw = Math.abs(bestTag.getYaw() - dSub.getYaw());
-      double set = controller.calculate(adjustedYaw);
-      dSub.driveFromNum(0.0, 0.0, set);
+    if(Math.abs(dubsup.getAsDouble()) >= .1) {
+      SmartDashboard.putBoolean("Setting", true);
+      armAngleSub.setPercentage(dubsup.getAsDouble() * .1);
+    }
+    else {
+      SmartDashboard.putBoolean("Setting", false);
+     // armAngleSub.setPercentage(0.0);
+      armAngleSub.stopArm();
     }
   }
+
 
   // Called once the command ends or is interrupted.
   @Override
