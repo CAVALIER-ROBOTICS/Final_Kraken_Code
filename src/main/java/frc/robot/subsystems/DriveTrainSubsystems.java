@@ -6,14 +6,16 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.SwerveLibrary.Mk4SwerveModuleHelper;
-import frc.robot.subsystems.SwerveLibrary.SdsModuleConfigurations;
-import frc.robot.subsystems.SwerveLibrary.SwerveModule;
+import frc.robot.Liberderry.MkSwerveModuleBuilder;
+import frc.robot.Liberderry.MotorType;
+import frc.robot.Liberderry.SdsModuleConfigurations;
+import frc.robot.Liberderry.SwerveModule;
 
 import java.util.function.DoubleSupplier;
 
+import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
-
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -65,40 +67,44 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
     // pidgey.setStatusFramePeriod(PigeonIMU_StatusFrame.BiasedStatus_2_Gyro,
     // 62150);
 
-    frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(
-        // This can either be STANDARD or FAST depending on your gear configuration
-        Mk4SwerveModuleHelper.GearRatio.L3,
-        // This is the ID of the drive motor
-        frontLeftDriveMotor,
-        // This is the ID of the steer motor
-        frontLeftSteerMotor,
-        // This is the ID of the steer encoder
-        frontLeftSteerEncoder,
-        // This is how much the steer encoder is offset from true zero (In our case,
-        // zero is facing straight forward)
-        frontLeftModuleSteerOffset);
+    MkSwerveModuleBuilder backLeftModuleBuilder = new MkSwerveModuleBuilder();
+    MkSwerveModuleBuilder backRightModuleBuilder = new MkSwerveModuleBuilder();
+    MkSwerveModuleBuilder frontRightModuleBuilder = new MkSwerveModuleBuilder();
+    MkSwerveModuleBuilder frontLeftModuleBuilder = new MkSwerveModuleBuilder();
 
-    frontRightModule = Mk4SwerveModuleHelper.createFalcon500(
-        Mk4SwerveModuleHelper.GearRatio.L3,
-        frontRightDriveMotor,
-        frontRightSteerMotor,
-        frontRightSteerEncoder,
-        frontRightModuleSteerOffset);
+    backLeftModuleBuilder.withGearRatio(SdsModuleConfigurations.MK4_L3);
+    backRightModuleBuilder.withGearRatio(SdsModuleConfigurations.MK4_L3);
+    frontRightModuleBuilder.withGearRatio(SdsModuleConfigurations.MK4_L3);
+    frontLeftModuleBuilder.withGearRatio(SdsModuleConfigurations.MK4_L3);
 
-    backLeftModule = Mk4SwerveModuleHelper.createFalcon500(
-        Mk4SwerveModuleHelper.GearRatio.L3,
-        backLeftDriveMotor,
-        backLeftSteerMotor,
-        backLeftSteerEncoder,
-        backLeftModuleSteerOffset);
+    backLeftModuleBuilder.withSteerOffset(DriveTrainConstants.backLeftModuleSteerOffset);
+    backRightModuleBuilder.withSteerOffset(DriveTrainConstants.backRightModuleSteerOffset);
+    frontRightModuleBuilder.withSteerOffset(DriveTrainConstants.frontRightModuleSteerOffset);
+    frontLeftModuleBuilder.withSteerOffset(DriveTrainConstants.frontLeftModuleSteerOffset);
 
-    backRightModule = Mk4SwerveModuleHelper.createFalcon500(
-        // Shuffleboard.getTab("SwerveData").getLayout("SwerveData"),
-        Mk4SwerveModuleHelper.GearRatio.L3,
-        backRightDriveMotor,
-        backRightSteerMotor,
-        backRightSteerEncoder,
-        backRightModuleSteerOffset);
+    backLeftModuleBuilder.withDriveMotor(MotorType.FALCON, DriveTrainConstants.backLeftDriveMotor, "OTHERCANIVORE");
+    backLeftModuleBuilder.withSteerMotor(MotorType.FALCON, DriveTrainConstants.backLeftSteerMotor, "OTHERCANIVORE");
+    backLeftModuleBuilder.withSteerEncoderPort(DriveTrainConstants.backLeftSteerEncoder, "OTHERCANIVORE");
+
+    backRightModuleBuilder.withDriveMotor(MotorType.FALCON, DriveTrainConstants.backRightDriveMotor, "OTHERCANIVORE");
+    backRightModuleBuilder.withSteerMotor(MotorType.FALCON, DriveTrainConstants.backRightSteerMotor, "OTHERCANIVORE");
+    backRightModuleBuilder.withSteerEncoderPort(DriveTrainConstants.backRightSteerEncoder, "OTHERCANIVORE");
+
+    frontRightModuleBuilder.withDriveMotor(MotorType.FALCON, DriveTrainConstants.frontRightDriveMotor, "OTHERCANIVORE");
+    frontRightModuleBuilder.withSteerMotor(MotorType.FALCON, DriveTrainConstants.frontRightSteerMotor, "OTHERCANIVORE");
+    frontRightModuleBuilder.withSteerEncoderPort(DriveTrainConstants.frontRightSteerEncoder, "OTHERCANIVORE");
+
+    frontLeftModuleBuilder.withDriveMotor(MotorType.FALCON, DriveTrainConstants.frontLeftDriveMotor, "OTHERCANIVORE");
+    frontLeftModuleBuilder.withSteerMotor(MotorType.FALCON, DriveTrainConstants.frontLeftSteerMotor, "OTHERCANIVORE");
+    frontLeftModuleBuilder.withSteerEncoderPort(DriveTrainConstants.frontLeftSteerEncoder, "OTHERCANIVORE");
+    
+    frontLeftModule = frontLeftModuleBuilder.build();
+    frontRightModule = frontRightModuleBuilder.build();
+    backRightModule = backRightModuleBuilder.build();
+    backLeftModule = backLeftModuleBuilder.build();
+
+    // CANCoder fl = (CANCoder) frontLeftModule.getSteerEncoder();
+    // fl.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, 10);
 
     updatePositions();
     odo = new SwerveDriveOdometry(Constants.m_kinematics, pidgey.getRotation2d(), positions);
@@ -153,10 +159,10 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("BackRight", backRightModule.getSteerAngle());
-    SmartDashboard.putNumber("BackLeft", backLeftModule.getSteerAngle());
-    SmartDashboard.putNumber("FrontRight", frontRightModule.getSteerAngle());
-    SmartDashboard.putNumber("FrontLeft", frontLeftModule.getSteerAngle());
+    SmartDashboard.putNumber("BackRight", Math.toDegrees(backRightModule.getSteerAngle()));
+    SmartDashboard.putNumber("BackLeft", Math.toDegrees(backLeftModule.getSteerAngle()));
+    SmartDashboard.putNumber("FrontRight", Math.toDegrees(frontRightModule.getSteerAngle()));
+    SmartDashboard.putNumber("FrontLeft", Math.toDegrees(frontLeftModule.getSteerAngle()));
   }
 
   public SwerveModuleState[] invert(SwerveModuleState[] x) {

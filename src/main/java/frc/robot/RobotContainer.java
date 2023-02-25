@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands.FieldDriveCommand;
 import frc.robot.commands.DriveCommands.RobotDriveCommand;
 import frc.robot.commands.DriveCommands.TestMotorCommand;
+import frc.robot.commands.DriveCommands.VacuumCommand;
 import frc.robot.commands.DriveCommands.ArmCommands.ArmAngleCommand;
 import frc.robot.commands.DriveCommands.ArmCommands.ArmInCommand;
 import frc.robot.commands.DriveCommands.ArmCommands.ArmOutCOmmand;
@@ -39,6 +40,7 @@ import frc.robot.subsystems.TestMotorSub;
 import frc.robot.subsystems.WristSub;
 import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
 import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
+import frc.robot.subsystems.VacuumSubsystems.VacuumSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -69,6 +71,7 @@ public class RobotContainer {
   Trigger armOut = new Trigger(() -> getRightTrigger(operator));
   Trigger armIn = new Trigger(() -> getLeftTrigger(operator));
 
+  VacuumSubsystem vacSub = new VacuumSubsystem();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -77,17 +80,16 @@ public class RobotContainer {
     SmartDashboard.putNumber("Hood Angle input", 14);
     SmartDashboard.putNumber("RPM input", .2);
 
-    // driveSub.setDefaultCommand(
-    //     new RobotDriveCommand(
-    //         () -> modifyAxis(driver.getLeftY() *
-    //             DriveTrainSubsystems.maxVelocityPerSecond),
-    //         () -> modifyAxis(driver.getLeftX() *
-    //             DriveTrainSubsystems.maxVelocityPerSecond),
-    //         () -> modifyAxis(driver.getRightX() *
-    //             DriveTrainSubsystems.maxAnglarVelocityPerSecond),
-    //         driveSub));
+    driveSub.setDefaultCommand(
+        new RobotDriveCommand(
+            () -> modifyAxis(driver.getLeftY() *
+                DriveTrainSubsystems.maxVelocityPerSecond),
+            () -> modifyAxis(driver.getLeftX() *
+                DriveTrainSubsystems.maxVelocityPerSecond),
+            () -> modifyAxis(driver.getRightX() *
+                DriveTrainSubsystems.maxAnglarVelocityPerSecond),
+            driveSub));
 
-    
     configureButtonBindings();
   }
 
@@ -105,15 +107,17 @@ public class RobotContainer {
     JoystickButton changeDrive = new JoystickButton(driver, 3);
     JoystickButton driveForward = new JoystickButton(driver, 1);
     JoystickButton resetGyro = new JoystickButton(driver, 4);
+    JoystickButton setVacuum = new JoystickButton(operator, 1);
 
     armAngleSub.setDefaultCommand(new ArmAngleCommand(armAngleSub, operator::getRightY));
     resetGyro.whileTrue(new InstantCommand(driveSub::zeroGyroscope));
+    setVacuum.whileTrue(new VacuumCommand(vacSub));
 
     armOut.whileTrue(new ArmOutCOmmand(armExtendSub));
     armIn.whileTrue(new ArmInCommand(armExtendSub));
 
     wristSubsystem.setDefaultCommand(new WristCommand(wristSubsystem, operator::getLeftY));
-  
+
     changeDrive.toggleOnTrue(
         new FieldDriveCommand(
             () -> modifyAxis(driver.getRawAxis(1)),
@@ -121,24 +125,20 @@ public class RobotContainer {
             () -> modifyAxis(driver.getRawAxis(4)),
             driveSub));
 
-    // vacTrigger.whileTrue(new ArmExtendCommand(armExtendSub, () -> getShouldNegate(driver)));
+    // vacTrigger.whileTrue(new ArmExtendCommand(armExtendSub, () ->
+    // getShouldNegate(driver)));
 
-    
-    
-   // driveForward.whileTrue(new InstantCommand( () -> driveSub.drive(new ChassisSpeeds(0, 10, 0))));
+    // driveForward.whileTrue(new InstantCommand( () -> driveSub.drive(new
+    // ChassisSpeeds(0, 10, 0))));
   }
 
-
-
   // public void resetOdo() {
-  //   driveSub.resetOdometry(path.getInitialPose());
+  // driveSub.resetOdometry(path.getInitialPose());
   // }
 
   // public void updateOdometry() {
-  //   driveSub.updateOdo();
+  // driveSub.updateOdo();
   // }
-
-
 
   private static double deadband(double value, double deadband) {
     if (Math.abs(value) > deadband) {

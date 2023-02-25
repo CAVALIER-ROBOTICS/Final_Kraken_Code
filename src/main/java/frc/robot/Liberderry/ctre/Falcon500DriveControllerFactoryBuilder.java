@@ -1,24 +1,14 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+package frc.robot.Liberderry.ctre;
 
-package frc.robot.subsystems.SwerveLibrary.ctre;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import com.ctre.phoenixpro.signals.NeutralModeValue;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
-import frc.robot.subsystems.SwerveLibrary.DriveController;
-import frc.robot.subsystems.SwerveLibrary.DriveControllerFactory;
-import frc.robot.subsystems.SwerveLibrary.ModuleConfiguration;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import frc.robot.Liberderry.DriveController;
+import frc.robot.Liberderry.DriveControllerFactory;
+import frc.robot.Liberderry.MechanicalConfiguration;
 
-/** Add your docs here. */
 public final class Falcon500DriveControllerFactoryBuilder {
     private static final double TICKS_PER_ROTATION = 2048.0;
 
@@ -52,11 +42,10 @@ public final class Falcon500DriveControllerFactoryBuilder {
 
     private class FactoryImplementation implements DriveControllerFactory<ControllerImplementation, Integer> {
         @Override
-        public ControllerImplementation create(Integer driveConfiguration, ModuleConfiguration moduleConfiguration) {
+        public ControllerImplementation create(Integer id, String canbus, MechanicalConfiguration mechConfiguration) {
             TalonFXConfiguration motorConfiguration = new TalonFXConfiguration();
 
-            double sensorPositionCoefficient = Math.PI * moduleConfiguration.getWheelDiameter() * moduleConfiguration.getDriveReduction() / TICKS_PER_ROTATION;
-            double sensorVelocityCoefficient = sensorPositionCoefficient * 10.0;
+            double sensorPositionCoefficient = Math.PI * mechConfiguration.getWheelDiameter() * mechConfiguration.getDriveReduction() / TICKS_PER_ROTATION;
 
             if (hasVoltageCompensation()) {
                 motorConfiguration.voltageCompSaturation = nominalVoltage;
@@ -67,7 +56,7 @@ public final class Falcon500DriveControllerFactoryBuilder {
                 motorConfiguration.supplyCurrLimit.enable = true;
             }
 
-            TalonFX motor = new TalonFX(driveConfiguration, "OTHERCANIVORE"); //TODO This is where motor is siinatnntiated
+            WPI_TalonFX motor = new WPI_TalonFX(id, canbus);
             CtreUtils.checkCtreError(motor.configAllSettings(motorConfiguration), "Failed to configure Falcon 500");
 
             if (hasVoltageCompensation()) {
@@ -77,7 +66,7 @@ public final class Falcon500DriveControllerFactoryBuilder {
 
             motor.setNeutralMode(NeutralMode.Brake);
 
-            motor.setInverted(moduleConfiguration.isDriveInverted() ? TalonFXInvertType.Clockwise : TalonFXInvertType.CounterClockwise);
+            motor.setInverted(mechConfiguration.isDriveInverted() ? TalonFXInvertType.Clockwise : TalonFXInvertType.CounterClockwise);
             motor.setSensorPhase(true);
 
             // Reduce CAN status frame rates
@@ -90,22 +79,23 @@ public final class Falcon500DriveControllerFactoryBuilder {
                     "Failed to configure Falcon status frame period"
             );
 
-            return new ControllerImplementation(motor, sensorVelocityCoefficient);
+            return new ControllerImplementation(motor, sensorPositionCoefficient);
         }
     }
 
     private class ControllerImplementation implements DriveController {
-        private final TalonFX motor;
-        private final double sensorVelocityCoefficient;
+        private final WPI_TalonFX motor;
+        private final double sensorPositionCoefficient;
         private final double nominalVoltage = hasVoltageCompensation() ? Falcon500DriveControllerFactoryBuilder.this.nominalVoltage : 12.0;
 
-        private ControllerImplementation(TalonFX motor, double sensorVelocityCoefficient) {
+        private ControllerImplementation(WPI_TalonFX motor, double sensorPositionCoefficient) {
             this.motor = motor;
-            this.sensorVelocityCoefficient = sensorVelocityCoefficient;
+            this.sensorPositionCoefficient = sensorPositionCoefficient;
         }
 
-        public TalonFX getMotor() {
-            return motor;
+        @Override
+        public MotorController getDriveMotor() {
+            return this.motor;
         }
 
         @Override
@@ -115,12 +105,13 @@ public final class Falcon500DriveControllerFactoryBuilder {
 
         @Override
         public double getStateVelocity() {
-            return motor.getSelectedSensorVelocity() * sensorVelocityCoefficient;
+            // Multiply to 10 to convert from m/100ms to m/s
+            return motor.getSelectedSensorVelocity() * sensorPositionCoefficient * 10.0;
         }
 
         @Override
-        public double getEncoder() {
-            return motor.getSelectedSensorPosition();
+        public double getStateDistance() {
+            return motor.getSelectedSensorPosition() * sensorPositionCoefficient;
         }
     }
 }
