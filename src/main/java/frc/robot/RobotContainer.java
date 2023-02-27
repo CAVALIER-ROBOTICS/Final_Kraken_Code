@@ -109,14 +109,15 @@ public class RobotContainer {
     JoystickButton resetGyro = new JoystickButton(driver, 4);
     JoystickButton setVacuum = new JoystickButton(operator, 1);
 
-    armAngleSub.setDefaultCommand(new ArmAngleCommand(armAngleSub, operator::getRightY));
+    armAngleSub.setDefaultCommand(new ArmAngleCommand(armAngleSub, operator::getLeftY));
+    // operator::getRightY));
     resetGyro.whileTrue(new InstantCommand(driveSub::zeroGyroscope));
     setVacuum.whileTrue(new VacuumCommand(vacSub));
 
     armOut.whileTrue(new ArmOutCOmmand(armExtendSub));
     armIn.whileTrue(new ArmInCommand(armExtendSub));
 
-    wristSubsystem.setDefaultCommand(new WristCommand(wristSubsystem, operator::getLeftY));
+    wristSubsystem.setDefaultCommand(new WristCommand(wristSubsystem, operator::getRightY));
 
     changeDrive.toggleOnTrue(
         new FieldDriveCommand(

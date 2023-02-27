@@ -37,6 +37,7 @@ public class CanCoderFactoryBuilder {
             encoder.configFactoryDefault();
             encoder.clearStickyFaults();
             encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, 10);
+            // encoder.setPositionToAbsolute();
             CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
 
             SmartDashboard.putNumber("Bruh", encoder.getAbsolutePosition());

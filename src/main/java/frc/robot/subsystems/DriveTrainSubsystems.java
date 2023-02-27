@@ -6,11 +6,13 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Liberderry.MechanicalConfiguration;
 import frc.robot.Liberderry.MkSwerveModuleBuilder;
 import frc.robot.Liberderry.MotorType;
 import frc.robot.Liberderry.SdsModuleConfigurations;
 import frc.robot.Liberderry.SwerveModule;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.sensors.CANCoder;
@@ -42,7 +44,7 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
   private final SwerveModule backLeftModule;
   private final SwerveModule backRightModule;
 
-  private int[] moduleDistTraveled = {0, 0, 0, 0};
+  private int[] moduleDistTraveled = { 0, 0, 0, 0 };
 
   private double xVelocity;
   private double yVelocity;
@@ -67,28 +69,31 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
     // pidgey.setStatusFramePeriod(PigeonIMU_StatusFrame.BiasedStatus_2_Gyro,
     // 62150);
 
+    // MechanicalConfiguration mechCon = new
+    // MechanicalConfiguration(DriveTrainConstants.kWheelRadius * 2, 6.12, false,
+    // 12.8, false);
+    MechanicalConfiguration mechCon = SdsModuleConfigurations.MK4_L3;
     MkSwerveModuleBuilder backLeftModuleBuilder = new MkSwerveModuleBuilder();
     MkSwerveModuleBuilder backRightModuleBuilder = new MkSwerveModuleBuilder();
     MkSwerveModuleBuilder frontRightModuleBuilder = new MkSwerveModuleBuilder();
     MkSwerveModuleBuilder frontLeftModuleBuilder = new MkSwerveModuleBuilder();
 
-    backLeftModuleBuilder.withGearRatio(SdsModuleConfigurations.MK4_L3);
-    backRightModuleBuilder.withGearRatio(SdsModuleConfigurations.MK4_L3);
-    frontRightModuleBuilder.withGearRatio(SdsModuleConfigurations.MK4_L3);
-    frontLeftModuleBuilder.withGearRatio(SdsModuleConfigurations.MK4_L3);
-
-    backLeftModuleBuilder.withSteerOffset(DriveTrainConstants.backLeftModuleSteerOffset);
-    backRightModuleBuilder.withSteerOffset(DriveTrainConstants.backRightModuleSteerOffset);
-    frontRightModuleBuilder.withSteerOffset(DriveTrainConstants.frontRightModuleSteerOffset);
-    frontLeftModuleBuilder.withSteerOffset(DriveTrainConstants.frontLeftModuleSteerOffset);
+    backLeftModuleBuilder.withGearRatio(mechCon);
+    backRightModuleBuilder.withGearRatio(mechCon);
+    ;
+    frontRightModuleBuilder.withGearRatio(mechCon);
+    frontLeftModuleBuilder.withGearRatio(mechCon);
 
     backLeftModuleBuilder.withDriveMotor(MotorType.FALCON, DriveTrainConstants.backLeftDriveMotor, "OTHERCANIVORE");
     backLeftModuleBuilder.withSteerMotor(MotorType.FALCON, DriveTrainConstants.backLeftSteerMotor, "OTHERCANIVORE");
-    backLeftModuleBuilder.withSteerEncoderPort(DriveTrainConstants.backLeftSteerEncoder, "OTHERCANIVORE");
+    backLeftModuleBuilder.withSteerEncoderPort(DriveTrainConstants.backRightSteerEncoder, "OTHERCANIVORE");
+    // backLeftModuleBuilder.withGearRatio(new
+    // MechanicalConfiguration(backLeftSteerEncoder, backLeftModuleSteerOffset,
+    // false, backLeftDriveMotor, false))
 
     backRightModuleBuilder.withDriveMotor(MotorType.FALCON, DriveTrainConstants.backRightDriveMotor, "OTHERCANIVORE");
     backRightModuleBuilder.withSteerMotor(MotorType.FALCON, DriveTrainConstants.backRightSteerMotor, "OTHERCANIVORE");
-    backRightModuleBuilder.withSteerEncoderPort(DriveTrainConstants.backRightSteerEncoder, "OTHERCANIVORE");
+    backRightModuleBuilder.withSteerEncoderPort(DriveTrainConstants.backLeftSteerEncoder, "OTHERCANIVORE");
 
     frontRightModuleBuilder.withDriveMotor(MotorType.FALCON, DriveTrainConstants.frontRightDriveMotor, "OTHERCANIVORE");
     frontRightModuleBuilder.withSteerMotor(MotorType.FALCON, DriveTrainConstants.frontRightSteerMotor, "OTHERCANIVORE");
@@ -97,14 +102,20 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
     frontLeftModuleBuilder.withDriveMotor(MotorType.FALCON, DriveTrainConstants.frontLeftDriveMotor, "OTHERCANIVORE");
     frontLeftModuleBuilder.withSteerMotor(MotorType.FALCON, DriveTrainConstants.frontLeftSteerMotor, "OTHERCANIVORE");
     frontLeftModuleBuilder.withSteerEncoderPort(DriveTrainConstants.frontLeftSteerEncoder, "OTHERCANIVORE");
-    
+
+    backLeftModuleBuilder.withSteerOffset(DriveTrainConstants.backLeftModuleSteerOffset);
+    backRightModuleBuilder.withSteerOffset(DriveTrainConstants.backRightModuleSteerOffset);
+    frontRightModuleBuilder.withSteerOffset(DriveTrainConstants.frontRightModuleSteerOffset);
+    frontLeftModuleBuilder.withSteerOffset(DriveTrainConstants.frontLeftModuleSteerOffset);
+
     frontLeftModule = frontLeftModuleBuilder.build();
     frontRightModule = frontRightModuleBuilder.build();
     backRightModule = backRightModuleBuilder.build();
     backLeftModule = backLeftModuleBuilder.build();
 
     // CANCoder fl = (CANCoder) frontLeftModule.getSteerEncoder();
-    // fl.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, 10);
+    // fl.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition,
+    // 10);
 
     updatePositions();
     odo = new SwerveDriveOdometry(Constants.m_kinematics, pidgey.getRotation2d(), positions);
@@ -190,6 +201,11 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
     positions[1] = frontRightModule.getPosition();
     positions[2] = backLeftModule.getPosition();
     positions[3] = backRightModule.getPosition();
+
+    // positions[0] = new SwerveModulePosition();
+    // positions[1] = new SwerveModulePosition();
+    // positions[2] = new SwerveModulePosition();
+    // positions[3] = new SwerveModulePosition();
 
     SmartDashboard.putNumber("FrontLeftPos", positions[0].distanceMeters);
   }
