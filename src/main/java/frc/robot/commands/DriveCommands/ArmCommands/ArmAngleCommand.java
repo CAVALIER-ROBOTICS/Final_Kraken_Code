@@ -32,24 +32,28 @@ public class ArmAngleCommand extends CommandBase {
   public void execute() {
     if(Math.abs(dubsup.getAsDouble()) >= .1) {
       SmartDashboard.putBoolean("Setting", true);
-      armAngleSub.setPercentage(dubsup.getAsDouble() * .1);
+      armAngleSub.setPercentage(dubsup.getAsDouble() * .25);
     }
     else {
       SmartDashboard.putBoolean("Setting", false);
      // armAngleSub.setPercentage(0.0);
       armAngleSub.stopArm();
     }
+
+    // armAngleSub.setAnglePosition(-90);
+    // SmartDashboard.putNumber("ArmAngle", armAngleSub.getAngle());
   }
 
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    armAngleSub.setPercentage(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return armAngleSub.isAtLow();
   }
 }

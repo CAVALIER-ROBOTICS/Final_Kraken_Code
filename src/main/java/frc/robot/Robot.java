@@ -22,6 +22,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -31,6 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.DriveTrainSubsystems;
 import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
 
 /**
@@ -62,6 +64,7 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+    drive = robotContainer.getDriveCommand();
 
     // cMatch.addColorMatch(kBlueTarget);
     // cMatch.addColorMatch(kRedTarget);
@@ -103,12 +106,18 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
+    ArmAngleSubsytem armAngleSubsytem = robotContainer.getArmAngleSub();
+    armAngleSubsytem.stopArm();
+
+    DriveTrainSubsystems driveSub = robotContainer.getDriveSub();
+    driveSub.drive(new ChassisSpeeds(1, 0, 0));
   }
 
   @Override
   public void disabledPeriodic() {
-    ArmAngleSubsytem armAngleSubsytem = robotContainer.getArmAngleSub();
-    armAngleSubsytem.stopArm();
+  
+    // DriveTrainSubsystems driveSub = robotContainer.getDriveSub();
+    // driveSub.drive(new ChassisSpeeds(0, 0, 0));
   }
 
   /**

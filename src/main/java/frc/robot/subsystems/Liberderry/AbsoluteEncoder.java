@@ -1,4 +1,4 @@
-package frc.robot.Liberderry;
+package frc.robot.subsystems.Liberderry;
 
 @FunctionalInterface
 public interface AbsoluteEncoder {

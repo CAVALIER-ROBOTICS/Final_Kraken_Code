@@ -1,4 +1,4 @@
-package frc.robot.Liberderry;
+package frc.robot.subsystems.Liberderry;
 
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
@@ -12,4 +12,6 @@ public interface SteerController {
     void setReferenceAngle(double referenceAngleRadians);
 
     double getStateAngle();
+
+    void resetToAbsolute();
 }

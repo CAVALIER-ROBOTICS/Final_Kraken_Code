@@ -1,4 +1,4 @@
-package frc.robot.Liberderry;
+package frc.robot.subsystems.Liberderry;
 
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -113,6 +113,11 @@ public class SwerveModuleFactory<DC, SC> {
         @Override
         public double getSteerAngle() {
             return steerController.getStateAngle();
+        }
+
+        @Override
+        public void resetToAbsolute() {
+            steerController.resetToAbsolute();
         }
 
         @Override

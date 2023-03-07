@@ -4,20 +4,8 @@
 
 package frc.robot;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.photonvision.PhotonCamera;
-
 import com.pathplanner.lib.PathConstraints;
 
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -47,9 +35,9 @@ public final class Constants {
                         "FourBallPath2"
         };
 
-     
         public static final double WHEELRADMM = (3.9 * 2.54) / 2;
-        public static final Transform3d CAMERA_TO_ROBOT = new Transform3d(new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)), new Pose3d(0.0, .762, 0.0, new Rotation3d()));
+        public static final Transform3d CAMERA_TO_ROBOT = new Transform3d(new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)),
+                        new Pose3d(0.0, .762, 0.0, new Rotation3d()));
 
         public static final String simpleAuto = "SimpleAuto";
 
@@ -60,24 +48,26 @@ public final class Constants {
         public static final int vacuum77ID = 77;
 
         public static final int armExtendID = 33;
-        
+
         public static final int armAngle11ID = 11;
         public static final int armAngle22ID = 22;
 
-        public final static double L = .5715;
-        public final static double W = .5715;
+        public static final int wristRotID = 55;
+
+        public final static double L = .737;
+        public final static double W = .737;
 
         public static final PathConstraints CONSTRAINTS = new PathConstraints(4, 3);
 
         public final static SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
                         // Front left
-                        new Translation2d(L / 2, W / 2), // .4041 .5751
+                        new Translation2d(-L / 2, -W / 2), // .4041 .5751
                         // Front right
-                        new Translation2d(L / 2, -W / 2),
-                        // Back left
                         new Translation2d(-L / 2, W / 2),
                         // Back right
-                        new Translation2d(-L / 2, -W / 2));
+                        new Translation2d(L / 2, W / 2),
+                        // Back left
+                        new Translation2d(L / 2, -W / 2));
 
         public static final int encoderCPR = 2048;
         // inches
@@ -110,16 +100,16 @@ public final class Constants {
                 public static final double maxAngularSpeedRadiansPerSecond = Math.PI;
                 public static final double maxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-                public static final double PIDXP = 0.0000007; //0.0000000008
-                public static final double PIDYP = 0.00000;
+                public static final double PIDXP = 0.007; // 0.0000000008
+                public static final double PIDYP = 0.001;
 
-                public static final double PIDXI = .000001;
+                public static final double PIDXI = .0001;
                 public static final double PIDXD = .0001;
 
-                public static final double PIDYI = .000001;
+                public static final double PIDYI = .0001;
                 public static final double PIDYD = .0001;
 
-                public static final double thetaP = .005; //.005
+                public static final double thetaP = .005; // .005
                 public static final double thetaI = 0.0001;
                 public static final double thetaD = 0;
 

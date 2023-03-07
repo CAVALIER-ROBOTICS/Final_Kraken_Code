@@ -1,4 +1,4 @@
-package frc.robot.Liberderry;
+package frc.robot.subsystems.Liberderry;
 
 public final class SdsModuleConfigurations {
     public static final MechanicalConfiguration MK3_STANDARD = new MechanicalConfiguration(

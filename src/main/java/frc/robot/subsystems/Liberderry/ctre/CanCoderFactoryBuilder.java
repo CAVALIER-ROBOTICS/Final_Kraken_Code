@@ -1,4 +1,4 @@
-package frc.robot.Liberderry.ctre;
+package frc.robot.subsystems.Liberderry.ctre;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
@@ -7,9 +7,8 @@ import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Liberderry.AbsoluteEncoder;
-import frc.robot.Liberderry.AbsoluteEncoderFactory;
+import frc.robot.subsystems.Liberderry.AbsoluteEncoder;
+import frc.robot.subsystems.Liberderry.AbsoluteEncoderFactory;
 
 public class CanCoderFactoryBuilder {
     private Direction direction = Direction.COUNTER_CLOCKWISE;
@@ -34,17 +33,10 @@ public class CanCoderFactoryBuilder {
             config.initializationStrategy = configuration.getInitStrategy();
 
             WPI_CANCoder encoder = new WPI_CANCoder(configuration.getId(), configuration.getCanbus());
-            encoder.configFactoryDefault();
-            encoder.clearStickyFaults();
-            encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, 10);
-            // encoder.setPositionToAbsolute();
-            CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
+            encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+            // CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
 
-            SmartDashboard.putNumber("Bruh", encoder.getAbsolutePosition());
-
-            CtreUtils.checkCtreError(
-                    encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, periodMilliseconds, 250),
-                    "Failed to configure CANCoder update rate");
+            CtreUtils.checkCtreError(encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, periodMilliseconds, 250), "Failed to configure CANCoder update rate");
 
             return new EncoderImplementation(encoder);
         };
@@ -66,18 +58,15 @@ public class CanCoderFactoryBuilder {
             ErrorCode code = encoder.getLastError();
 
             for (int i = 0; i < ATTEMPTS; i++) {
-                if (code == ErrorCode.OK)
-                    break;
+                if (code == ErrorCode.OK) break;
                 try {
                     Thread.sleep(10);
-                } catch (InterruptedException e) {
-                }
+                } catch (InterruptedException e) { }
                 angle = Math.toRadians(encoder.getPosition());
                 code = encoder.getLastError();
             }
 
-            CtreUtils.checkCtreError(code, "Failed to retrieve CANcoder " + encoder.getDeviceID()
-                    + " absolute position after " + ATTEMPTS + " tries");
+            CtreUtils.checkCtreError(code, "Failed to retrieve CANcoder "+encoder.getDeviceID()+" absolute position after "+ATTEMPTS+" tries");
 
             angle %= 2.0 * Math.PI;
             if (angle < 0.0) {

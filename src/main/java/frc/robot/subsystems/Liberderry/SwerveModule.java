@@ -1,4 +1,4 @@
-package frc.robot.Liberderry;
+package frc.robot.subsystems.Liberderry;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -40,6 +40,11 @@ public interface SwerveModule {
     default SwerveModulePosition getPosition() {
         return new SwerveModulePosition(getDriveDistance(), Rotation2d.fromRadians(getSteerAngle()));
     }
+
+    /**
+     * Reset motor or encoder position to the absolute position. May take a little bit.
+     */
+    void resetToAbsolute();
 
     void set(double driveVoltage, double steerAngle);
 }

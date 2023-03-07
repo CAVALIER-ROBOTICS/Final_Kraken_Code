@@ -21,6 +21,8 @@ public class WristSub extends SubsystemBase {
     wristPID.setP(0.0);
     wristPID.setI(0.0);
     wristPID.setD(0.0);
+
+    wristMotor.enableVoltageCompensation(12.5);
   }
 
   public void setWrist(double percentage) {

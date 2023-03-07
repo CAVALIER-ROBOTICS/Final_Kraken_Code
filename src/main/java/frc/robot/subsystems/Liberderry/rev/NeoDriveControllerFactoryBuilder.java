@@ -1,12 +1,14 @@
-package frc.robot.Liberderry.rev;
+package frc.robot.subsystems.Liberderry.rev;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import frc.robot.Liberderry.DriveController;
-import frc.robot.Liberderry.DriveControllerFactory;
-import frc.robot.Liberderry.MechanicalConfiguration;
+import frc.robot.subsystems.Liberderry.DriveController;
+import frc.robot.subsystems.Liberderry.DriveControllerFactory;
+import frc.robot.subsystems.Liberderry.MechanicalConfiguration;
+
+import static frc.robot.subsystems.Liberderry.rev.RevUtils.checkNeoError;
 
 public final class NeoDriveControllerFactoryBuilder {
     private double nominalVoltage = Double.NaN;
@@ -42,16 +44,16 @@ public final class NeoDriveControllerFactoryBuilder {
 
             // Setup voltage compensation
             if (hasVoltageCompensation()) {
-                //checkNeoError(motor.enableVoltageCompensation(nominalVoltage), "Failed to enable voltage compensation");
+                checkNeoError(motor.enableVoltageCompensation(nominalVoltage), "Failed to enable voltage compensation");
             }
 
             if (hasCurrentLimit()) {
-               // checkNeoError(motor.setSmartCurrentLimit((int) currentLimit), "Failed to set current limit for NEO");
+                checkNeoError(motor.setSmartCurrentLimit((int) currentLimit), "Failed to set current limit for NEO");
             }
 
-            // checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100), "Failed to set periodic status frame 0 rate");
-            // checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20), "Failed to set periodic status frame 1 rate");
-            // checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20), "Failed to set periodic status frame 2 rate");
+            checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100), "Failed to set periodic status frame 0 rate");
+            checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20), "Failed to set periodic status frame 1 rate");
+            checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20), "Failed to set periodic status frame 2 rate");
             // Set neutral mode to brake
             motor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 

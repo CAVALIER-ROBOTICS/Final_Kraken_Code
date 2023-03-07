@@ -13,6 +13,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,7 +29,8 @@ public class ArmAngleSubsytem extends SubsystemBase {
   private RelativeEncoder angleEncoderRight = angleMotorRight.getEncoder();
 
   private SparkMaxPIDController anglePIDLeft = angleMotorLeft.getPIDController();
-  private SparkMaxPIDController anglePIDRight = angleMotorRight.getPIDController();
+
+  DigitalInput limitSwitch = new DigitalInput(9);
 
   public ArmAngleSubsytem() {
     // angleMotorLeft.restoreFactoryDefaults();
@@ -37,7 +39,7 @@ public class ArmAngleSubsytem extends SubsystemBase {
     // angleMotorRight.restoreFactoryDefaults();
     // angleMotorRight.setIdleMode(IdleMode.kBrake);
 
-    anglePIDLeft.setP(1.5); //IT JUST WORKS 1.5, .01, .075
+    anglePIDLeft.setP(.3); // IT JUST WORKS 1.5, .01, .075
     anglePIDLeft.setI(.01);
     anglePIDLeft.setD(.075);
     // angleMotorLeft.setInverted(true);
@@ -61,6 +63,12 @@ public class ArmAngleSubsytem extends SubsystemBase {
   }
 
   public void setAnglePosition(double setpoint) {
+
+    anglePIDLeft.setP(.01);
+    anglePIDLeft.setI(.000015);
+    anglePIDLeft.setD(.00002);
+    // anglePIDLeft.setFF(.0001);
+
     double encoderRot = setpoint / 360 * 50;
     anglePIDLeft.setReference(encoderRot, CANSparkMax.ControlType.kPosition);
     // anglePIDRight.setReference(encoderRot, CANSparkMax.ControlType.kPosition);
@@ -73,7 +81,16 @@ public class ArmAngleSubsytem extends SubsystemBase {
   }
 
   public void stopArm() {
+    anglePIDLeft.setP(.3);
+    anglePIDLeft.setI(.01);
+    anglePIDLeft.setD(.075);
+
+
     anglePIDLeft.setReference(angleEncoderLeft.getPosition(), CANSparkMax.ControlType.kPosition);
+  }
+
+  public double getAngle() {
+    return angleEncoderLeft.getPosition() * 360 / 50;
   }
 
   public void resetEncoder() {
@@ -82,6 +99,15 @@ public class ArmAngleSubsytem extends SubsystemBase {
 
   public void stopLoop() {
     angleMotorLeft.set(0.0);
+  }
+
+  public boolean isAtLow() {
+    return limitSwitch.get();
+  }
+
+  public void zeroPos() {
+    angleEncoderLeft.setPosition(0.0);
+    angleEncoderRight.setPosition(0.0);
   }
 
   @Override

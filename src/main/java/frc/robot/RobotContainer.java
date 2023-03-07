@@ -8,7 +8,10 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.cscore.MjpegServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.ErrorMessages;
@@ -34,9 +37,11 @@ import frc.robot.commands.DriveCommands.VacuumCommand;
 import frc.robot.commands.DriveCommands.ArmCommands.ArmAngleCommand;
 import frc.robot.commands.DriveCommands.ArmCommands.ArmInCommand;
 import frc.robot.commands.DriveCommands.ArmCommands.ArmOutCOmmand;
+import frc.robot.commands.DriveCommands.ArmCommands.HomeArmCommand;
 import frc.robot.commands.DriveCommands.WristCommands.WristCommand;
 import frc.robot.subsystems.DriveTrainSubsystems;
 import frc.robot.subsystems.TestMotorSub;
+import frc.robot.subsystems.WristRotSub;
 import frc.robot.subsystems.WristSub;
 import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
 import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
@@ -56,10 +61,15 @@ public class RobotContainer {
   public static XboxController driver = new XboxController(0);
   public static XboxController operator = new XboxController(1);
 
+  UsbCamera camera;
+
   DriveTrainSubsystems driveSub = new DriveTrainSubsystems();
   ArmAngleSubsytem armAngleSub = new ArmAngleSubsytem();
   ArmExtendSubsystem armExtendSub = new ArmExtendSubsystem();
   TestMotorSub testSub = new TestMotorSub();
+  WristRotSub wristRotSub = new WristRotSub();
+
+  DriveAuto driveAuto = new DriveAuto(driveSub);
 
   WristSub wristSubsystem = new WristSub();
 
@@ -68,8 +78,8 @@ public class RobotContainer {
   // Trigger vacTrigger = new Trigger(() -> getRightTrigger(driver));
   // Trigger armextTrigger = new Trigger(() -> getRightTrigger(operator));
 
-  Trigger armOut = new Trigger(() -> getRightTrigger(operator));
-  Trigger armIn = new Trigger(() -> getLeftTrigger(operator));
+  Trigger armIn = new Trigger(() -> getRightTrigger(operator));
+  Trigger armOut = new Trigger(() -> getLeftTrigger(operator));
 
   VacuumSubsystem vacSub = new VacuumSubsystem();
 
@@ -77,11 +87,17 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    // camera = CameraServer.startAutomaticCapture();
+    // MjpegServer server = new MjpegServer("Camera", 1181);
+    // server.setFPS(30);
+    // server.setCompression(0);
+    // server.setSource(camera);
+  
     SmartDashboard.putNumber("Hood Angle input", 14);
     SmartDashboard.putNumber("RPM input", .2);
 
     driveSub.setDefaultCommand(
-        new RobotDriveCommand(
+        new FieldDriveCommand(
             () -> modifyAxis(driver.getLeftY() *
                 DriveTrainSubsystems.maxVelocityPerSecond),
             () -> modifyAxis(driver.getLeftX() *
@@ -109,10 +125,16 @@ public class RobotContainer {
     JoystickButton resetGyro = new JoystickButton(driver, 4);
     JoystickButton setVacuum = new JoystickButton(operator, 1);
 
-    armAngleSub.setDefaultCommand(new ArmAngleCommand(armAngleSub, operator::getLeftY));
+    JoystickButton wristCCW = new JoystickButton(operator, 5);
+    JoystickButton wristCW = new JoystickButton(operator, 6);
+
+    armAngleSub.setDefaultCommand(new SequentialCommandGroup(
+      new HomeArmCommand(armAngleSub),
+      new ArmAngleCommand(armAngleSub, operator::getLeftY)
+    ));
     // operator::getRightY));
     resetGyro.whileTrue(new InstantCommand(driveSub::zeroGyroscope));
-    setVacuum.whileTrue(new VacuumCommand(vacSub));
+    setVacuum.toggleOnTrue(new VacuumCommand(vacSub));
 
     armOut.whileTrue(new ArmOutCOmmand(armExtendSub));
     armIn.whileTrue(new ArmInCommand(armExtendSub));
@@ -125,6 +147,18 @@ public class RobotContainer {
             () -> modifyAxis(driver.getRawAxis(0)),
             () -> modifyAxis(driver.getRawAxis(4)),
             driveSub));
+
+    wristCW.whileTrue(new StartEndCommand(
+      () -> wristRotSub.setWrist(.1),
+      () -> wristRotSub.setWrist(0),
+      wristRotSub
+    ));
+
+    wristCCW.whileTrue(new StartEndCommand(
+      () -> wristRotSub.setWrist(-.1),
+      () -> wristRotSub.setWrist(0),
+      wristRotSub
+    ));
 
     // vacTrigger.whileTrue(new ArmExtendCommand(armExtendSub, () ->
     // getShouldNegate(driver)));
@@ -153,6 +187,12 @@ public class RobotContainer {
     }
   }
 
+  // public Command getArmUp (
+  //   return new SequentialCommandGroup(
+      
+  //   )
+  // )
+
   private static double modifyAxis(double value) {
     // Deadband
     value = deadband(value, 0.08);
@@ -162,6 +202,9 @@ public class RobotContainer {
     return value;
   }
 
+  public DriveTrainSubsystems getDriveSub() {
+    return driveSub;
+  }
   // private static boolean getUpDPad() {
   // return operator.getPOV() == 0;
   // }
@@ -180,6 +223,10 @@ public class RobotContainer {
 
   private static boolean getRightTrigger(XboxController controller) {
     return controller.getRightTriggerAxis() > 0.05;
+  }
+
+  public Command getDriveCommand() {
+    return driveAuto.getPath("Devin");
   }
 
   public ArmAngleSubsytem getArmAngleSub() {

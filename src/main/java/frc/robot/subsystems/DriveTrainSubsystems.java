@@ -6,11 +6,11 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Liberderry.MechanicalConfiguration;
-import frc.robot.Liberderry.MkSwerveModuleBuilder;
-import frc.robot.Liberderry.MotorType;
-import frc.robot.Liberderry.SdsModuleConfigurations;
-import frc.robot.Liberderry.SwerveModule;
+import frc.robot.subsystems.Liberderry.MechanicalConfiguration;
+import frc.robot.subsystems.Liberderry.MkSwerveModuleBuilder;
+import frc.robot.subsystems.Liberderry.MotorType;
+import frc.robot.subsystems.Liberderry.SdsModuleConfigurations;
+import frc.robot.subsystems.Liberderry.SwerveModule;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
@@ -72,28 +72,32 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
     // MechanicalConfiguration mechCon = new
     // MechanicalConfiguration(DriveTrainConstants.kWheelRadius * 2, 6.12, false,
     // 12.8, false);
-    MechanicalConfiguration mechCon = SdsModuleConfigurations.MK4_L3;
+    MechanicalConfiguration mechCon = SdsModuleConfigurations.MK4_L2;
     MkSwerveModuleBuilder backLeftModuleBuilder = new MkSwerveModuleBuilder();
     MkSwerveModuleBuilder backRightModuleBuilder = new MkSwerveModuleBuilder();
     MkSwerveModuleBuilder frontRightModuleBuilder = new MkSwerveModuleBuilder();
     MkSwerveModuleBuilder frontLeftModuleBuilder = new MkSwerveModuleBuilder();
 
+    backLeftModuleBuilder.withSteerOffset(DriveTrainConstants.backLeftModuleSteerOffset);
+    backRightModuleBuilder.withSteerOffset(DriveTrainConstants.backRightModuleSteerOffset);
+    frontRightModuleBuilder.withSteerOffset(DriveTrainConstants.frontRightModuleSteerOffset);
+    frontLeftModuleBuilder.withSteerOffset(DriveTrainConstants.frontLeftModuleSteerOffset);
+
     backLeftModuleBuilder.withGearRatio(mechCon);
     backRightModuleBuilder.withGearRatio(mechCon);
-    ;
     frontRightModuleBuilder.withGearRatio(mechCon);
     frontLeftModuleBuilder.withGearRatio(mechCon);
 
     backLeftModuleBuilder.withDriveMotor(MotorType.FALCON, DriveTrainConstants.backLeftDriveMotor, "OTHERCANIVORE");
     backLeftModuleBuilder.withSteerMotor(MotorType.FALCON, DriveTrainConstants.backLeftSteerMotor, "OTHERCANIVORE");
-    backLeftModuleBuilder.withSteerEncoderPort(DriveTrainConstants.backRightSteerEncoder, "OTHERCANIVORE");
+    backLeftModuleBuilder.withSteerEncoderPort(DriveTrainConstants.backLeftSteerEncoder, "OTHERCANIVORE");
     // backLeftModuleBuilder.withGearRatio(new
     // MechanicalConfiguration(backLeftSteerEncoder, backLeftModuleSteerOffset,
     // false, backLeftDriveMotor, false))
 
     backRightModuleBuilder.withDriveMotor(MotorType.FALCON, DriveTrainConstants.backRightDriveMotor, "OTHERCANIVORE");
     backRightModuleBuilder.withSteerMotor(MotorType.FALCON, DriveTrainConstants.backRightSteerMotor, "OTHERCANIVORE");
-    backRightModuleBuilder.withSteerEncoderPort(DriveTrainConstants.backLeftSteerEncoder, "OTHERCANIVORE");
+    backRightModuleBuilder.withSteerEncoderPort(DriveTrainConstants.backRightSteerEncoder, "OTHERCANIVORE");
 
     frontRightModuleBuilder.withDriveMotor(MotorType.FALCON, DriveTrainConstants.frontRightDriveMotor, "OTHERCANIVORE");
     frontRightModuleBuilder.withSteerMotor(MotorType.FALCON, DriveTrainConstants.frontRightSteerMotor, "OTHERCANIVORE");
@@ -102,11 +106,6 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
     frontLeftModuleBuilder.withDriveMotor(MotorType.FALCON, DriveTrainConstants.frontLeftDriveMotor, "OTHERCANIVORE");
     frontLeftModuleBuilder.withSteerMotor(MotorType.FALCON, DriveTrainConstants.frontLeftSteerMotor, "OTHERCANIVORE");
     frontLeftModuleBuilder.withSteerEncoderPort(DriveTrainConstants.frontLeftSteerEncoder, "OTHERCANIVORE");
-
-    backLeftModuleBuilder.withSteerOffset(DriveTrainConstants.backLeftModuleSteerOffset);
-    backRightModuleBuilder.withSteerOffset(DriveTrainConstants.backRightModuleSteerOffset);
-    frontRightModuleBuilder.withSteerOffset(DriveTrainConstants.frontRightModuleSteerOffset);
-    frontLeftModuleBuilder.withSteerOffset(DriveTrainConstants.frontLeftModuleSteerOffset);
 
     frontLeftModule = frontLeftModuleBuilder.build();
     frontRightModule = frontRightModuleBuilder.build();
@@ -145,20 +144,22 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
     // states = Constants.m_kinematics.toSwerveModuleStates(speeds);
     // frontLeftModule.set(states[0].speedMetersPerSecond / maxVelocityPerSecond *
     // maxVoltage, states[0].angle.getRadians());
-    frontLeftModule.set(states[0].speedMetersPerSecond / maxVelocityPerSecond * maxVoltage,
+    frontLeftModule.set(-states[0].speedMetersPerSecond / maxVelocityPerSecond * maxVoltage,
         states[0].angle.getRadians());
-    frontRightModule.set(states[1].speedMetersPerSecond / maxVelocityPerSecond * maxVoltage,
+    frontRightModule.set(-states[1].speedMetersPerSecond / maxVelocityPerSecond * maxVoltage,
         states[1].angle.getRadians());
-    backLeftModule.set(states[2].speedMetersPerSecond / maxVelocityPerSecond * maxVoltage,
+    // back right
+    backLeftModule.set(-states[2].speedMetersPerSecond / maxVelocityPerSecond * maxVoltage,
         states[2].angle.getRadians());
-    backRightModule.set(states[3].speedMetersPerSecond / maxVelocityPerSecond * maxVoltage,
+    // back left
+    backRightModule.set(-states[3].speedMetersPerSecond / maxVelocityPerSecond * maxVoltage,
         states[3].angle.getRadians());
   }
 
   public void setModules(SwerveModuleState[] speeds) {
     states = speeds;
     // drive(Constants.m_kinematics.toChassisSpeeds(speeds));
-    frontLeftModule.set(speeds[0].speedMetersPerSecond / -Constants.AutoConstants.maxSpeedMetersPerSecond * maxVoltage,
+    frontLeftModule.set(-speeds[0].speedMetersPerSecond / -Constants.AutoConstants.maxSpeedMetersPerSecond * maxVoltage,
         speeds[0].angle.getRadians());
     frontRightModule.set(speeds[1].speedMetersPerSecond / -Constants.AutoConstants.maxSpeedMetersPerSecond * maxVoltage,
         speeds[1].angle.getRadians());
@@ -249,14 +250,13 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
     yVelocity = ytrans.getAsDouble();
   }
 
-  public void robotOrientedDrive(DoubleSupplier xtrans, DoubleSupplier ytrans, DoubleSupplier rot) {
-    drive(
-        new ChassisSpeeds(
-            xtrans.getAsDouble(),
-            ytrans.getAsDouble(),
-            rot.getAsDouble()));
-    xVelocity = xtrans.getAsDouble();
-    yVelocity = ytrans.getAsDouble();
+  public void robotOrientedDrive(double xtrans, double ytrans, double rot) {
+    ChassisSpeeds speeds = new ChassisSpeeds(
+        xtrans,
+        ytrans,
+        rot);
+
+    drive(speeds);
   }
 
   public void driveFromNum(Double xtrans, Double ytrans, Double rot) {

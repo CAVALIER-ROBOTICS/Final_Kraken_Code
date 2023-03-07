@@ -21,8 +21,8 @@ public class ArmExtendSubsystem extends SubsystemBase {
   public CANSparkMax extendMotor = new CANSparkMax(Constants.armExtendID, MotorType.kBrushless);
   private RelativeEncoder extendEncoder = extendMotor.getEncoder();
   private SparkMaxPIDController extendPID = extendMotor.getPIDController();
-  DigitalInput highExtremeDigitalInput = new DigitalInput(0);
-  DigitalInput lowExtremeDigitalInput = new DigitalInput(1);
+  DigitalInput highExtremeDigitalInput = new DigitalInput(8);
+  DigitalInput lowExtremeDigitalInput = new DigitalInput(7);
   
   public ArmExtendSubsystem() {
     extendMotor.restoreFactoryDefaults();

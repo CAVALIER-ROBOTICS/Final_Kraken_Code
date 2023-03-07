@@ -34,12 +34,10 @@ public class RobotDriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    driveSub.drive(
-      new ChassisSpeeds(
+    driveSub.robotOrientedDrive(
             translationXSupplier.getAsDouble(),
             translationYSupplier.getAsDouble(),
-            rotationSupplier.getAsDouble())
-    );
+            rotationSupplier.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.

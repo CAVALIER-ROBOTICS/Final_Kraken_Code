@@ -1,13 +1,12 @@
-package frc.robot.Liberderry.ctre;
+package frc.robot.subsystems.Liberderry.ctre;
 
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import frc.robot.Liberderry.DriveController;
-import frc.robot.Liberderry.DriveControllerFactory;
-import frc.robot.Liberderry.MechanicalConfiguration;
+import frc.robot.subsystems.Liberderry.DriveController;
+import frc.robot.subsystems.Liberderry.DriveControllerFactory;
+import frc.robot.subsystems.Liberderry.MechanicalConfiguration;
 
 public final class Falcon500DriveControllerFactoryBuilder {
     private static final double TICKS_PER_ROTATION = 2048.0;
@@ -66,7 +65,7 @@ public final class Falcon500DriveControllerFactoryBuilder {
 
             motor.setNeutralMode(NeutralMode.Brake);
 
-            motor.setInverted(mechConfiguration.isDriveInverted() ? TalonFXInvertType.Clockwise : TalonFXInvertType.CounterClockwise);
+            // motor.setInverted(mechConfiguration.isDriveInverted() ? TalonFXInvertType.Clockwise : TalonFXInvertType.CounterClockwise);
             motor.setSensorPhase(true);
 
             // Reduce CAN status frame rates
