@@ -7,11 +7,12 @@ import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Liberderry.AbsoluteEncoder;
 import frc.robot.subsystems.Liberderry.AbsoluteEncoderFactory;
 
 public class CanCoderFactoryBuilder {
-    private Direction direction = Direction.COUNTER_CLOCKWISE;
+    private Direction direction = Direction.CLOCKWISE;
     private int periodMilliseconds = 10;
 
     public CanCoderFactoryBuilder withReadingUpdatePeriod(int periodMilliseconds) {
@@ -33,9 +34,8 @@ public class CanCoderFactoryBuilder {
             config.initializationStrategy = configuration.getInitStrategy();
 
             WPI_CANCoder encoder = new WPI_CANCoder(configuration.getId(), configuration.getCanbus());
-            encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-            // CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
-
+            // encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+            CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
             CtreUtils.checkCtreError(encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, periodMilliseconds, 250), "Failed to configure CANCoder update rate");
 
             return new EncoderImplementation(encoder);
@@ -43,7 +43,7 @@ public class CanCoderFactoryBuilder {
     }
 
     private static class EncoderImplementation implements AbsoluteEncoder {
-        private final int ATTEMPTS = 3; // TODO: Allow changing number of tries for getting correct position
+        private final int ATTEMPTS = 10; // TODO: Allow changing number of tries for getting correct position
 
         private final WPI_CANCoder encoder;
 
@@ -55,6 +55,7 @@ public class CanCoderFactoryBuilder {
         public double getAbsoluteAngle() {
             double angle = Math.toRadians(encoder.getPosition());
 
+            
             ErrorCode code = encoder.getLastError();
 
             for (int i = 0; i < ATTEMPTS; i++) {
@@ -68,10 +69,10 @@ public class CanCoderFactoryBuilder {
 
             CtreUtils.checkCtreError(code, "Failed to retrieve CANcoder "+encoder.getDeviceID()+" absolute position after "+ATTEMPTS+" tries");
 
-            angle %= 2.0 * Math.PI;
-            if (angle < 0.0) {
-                angle += 2.0 * Math.PI;
-            }
+            // angle %= 2.0 * Math.PI;
+            // if (angle < 0.0) {
+            //     angle += 2.0 * Math.PI;
+            // }
 
             return angle;
         }

@@ -32,7 +32,7 @@ public class ArmExtendSubsystem extends SubsystemBase {
     extendPID.setP(0.05);
     extendPID.setI(0.01);
     extendPID.setD(0.001);
-
+    
     extendMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
     extendMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
 
@@ -57,6 +57,11 @@ public class ArmExtendSubsystem extends SubsystemBase {
   public boolean getIsAtLow() {
     return lowExtremeDigitalInput.get();
   }
+
+  public void zeroPos() {
+    extendEncoder.setPosition(0.0);
+  }
+
   
   @Override
   public void periodic() {

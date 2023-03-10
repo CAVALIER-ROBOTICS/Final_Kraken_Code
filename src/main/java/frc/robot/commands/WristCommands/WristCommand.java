@@ -2,19 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.DriveCommands.ArmCommands;
+package frc.robot.commands.WristCommands;
 
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.DriveTrainSubsystems;
-import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
-import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
+import frc.robot.subsystems.WristSub;
 
-public class HomeArmCommand extends CommandBase {
-  /** Creates a new HomeArmCommand. */
-  ArmAngleSubsytem armAngleSubsytem;
-  public HomeArmCommand(ArmAngleSubsytem armSub) {
-    armAngleSubsytem = armSub;
-    addRequirements(armSub);
+public class WristCommand extends CommandBase {
+  /** Creates a new WristCommand. */
+  WristSub wristSubsystem;
+  DoubleSupplier dubSubLol;
+  public WristCommand(WristSub wSub, DoubleSupplier dSup) {
+    wristSubsystem = wSub;
+    addRequirements(wristSubsystem);
+    dubSubLol = dSup;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -25,19 +28,16 @@ public class HomeArmCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    armAngleSubsytem.setPercentage(.075);
+    wristSubsystem.setWrist(dubSubLol.getAsDouble() * .1);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    armAngleSubsytem.setPercentage(0);
-    armAngleSubsytem.zeroPos();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return armAngleSubsytem.isAtLow();
+    return false;
   }
 }

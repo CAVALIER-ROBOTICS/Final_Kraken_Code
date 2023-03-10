@@ -41,6 +41,9 @@ public final class Constants {
 
         public static final String simpleAuto = "SimpleAuto";
 
+        public static final double WRIST_MAX = 360; // TODO get actual values
+        public static final double ARM_MAX = 360;
+
         public static final int wristID = 44;
 
         public static final int vacuum99ID = 99;
@@ -101,7 +104,7 @@ public final class Constants {
                 public static final double maxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
                 public static final double PIDXP = 0.007; // 0.0000000008
-                public static final double PIDYP = 0.001;
+                public static final double PIDYP = 0.007;
 
                 public static final double PIDXI = .0001;
                 public static final double PIDXD = .0001;

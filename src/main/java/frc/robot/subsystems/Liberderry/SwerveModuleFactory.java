@@ -114,7 +114,7 @@ public class SwerveModuleFactory<DC, SC> {
         public double getSteerAngle() {
             return steerController.getStateAngle();
         }
-
+        
         @Override
         public void resetToAbsolute() {
             steerController.resetToAbsolute();

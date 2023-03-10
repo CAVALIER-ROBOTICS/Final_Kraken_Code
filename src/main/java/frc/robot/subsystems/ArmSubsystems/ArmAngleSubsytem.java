@@ -39,15 +39,15 @@ public class ArmAngleSubsytem extends SubsystemBase {
     // angleMotorRight.restoreFactoryDefaults();
     // angleMotorRight.setIdleMode(IdleMode.kBrake);
 
-    anglePIDLeft.setP(.3); // IT JUST WORKS 1.5, .01, .075
-    anglePIDLeft.setI(.01);
-    anglePIDLeft.setD(.075);
     // angleMotorLeft.setInverted(true);
     // angleMotorRight.setInverted(false);
 
     // anglePIDRight.setP(.2);
     // anglePIDRight.setI(0);
     // anglePIDRight.setD(0);
+
+    angleMotorLeft.restoreFactoryDefaults();
+    angleMotorRight.restoreFactoryDefaults();
 
     angleMotorRight.follow(angleMotorLeft, true);
   }
@@ -63,13 +63,12 @@ public class ArmAngleSubsytem extends SubsystemBase {
   }
 
   public void setAnglePosition(double setpoint) {
-
-    anglePIDLeft.setP(.01);
-    anglePIDLeft.setI(.000015);
-    anglePIDLeft.setD(.00002);
-    // anglePIDLeft.setFF(.0001);
-
-    double encoderRot = setpoint / 360 * 50;
+    anglePIDLeft.setP(.02);
+    anglePIDLeft.setI(0.000001);
+    anglePIDLeft.setD(0);
+    anglePIDLeft.setFF(.0004);
+    
+    double encoderRot = (setpoint + 10) / Constants.ARM_MAX * 50;
     anglePIDLeft.setReference(encoderRot, CANSparkMax.ControlType.kPosition);
     // anglePIDRight.setReference(encoderRot, CANSparkMax.ControlType.kPosition);
 
@@ -84,7 +83,7 @@ public class ArmAngleSubsytem extends SubsystemBase {
     anglePIDLeft.setP(.3);
     anglePIDLeft.setI(.01);
     anglePIDLeft.setD(.075);
-
+    anglePIDLeft.setFF(0);
 
     anglePIDLeft.setReference(angleEncoderLeft.getPosition(), CANSparkMax.ControlType.kPosition);
   }

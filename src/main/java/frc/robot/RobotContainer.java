@@ -29,16 +29,17 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
+import frc.robot.commands.VacuumCommand;
+import frc.robot.commands.ArmCommands.ArmAngleCommand;
+import frc.robot.commands.ArmCommands.ArmInCommand;
+import frc.robot.commands.ArmCommands.ArmOutCommand;
+import frc.robot.commands.ArmCommands.AutoArmCommand;
+import frc.robot.commands.ArmCommands.HomeArmCommand;
+import frc.robot.commands.DriveCommands.ABCommand;
 import frc.robot.commands.DriveCommands.FieldDriveCommand;
 import frc.robot.commands.DriveCommands.RobotDriveCommand;
 import frc.robot.commands.DriveCommands.TestMotorCommand;
-import frc.robot.commands.DriveCommands.VacuumCommand;
-import frc.robot.commands.DriveCommands.ArmCommands.ArmAngleCommand;
-import frc.robot.commands.DriveCommands.ArmCommands.ArmInCommand;
-import frc.robot.commands.DriveCommands.ArmCommands.ArmOutCOmmand;
-import frc.robot.commands.DriveCommands.ArmCommands.HomeArmCommand;
-import frc.robot.commands.DriveCommands.WristCommands.WristCommand;
+import frc.robot.commands.WristCommands.WristCommand;
 import frc.robot.subsystems.DriveTrainSubsystems;
 import frc.robot.subsystems.TestMotorSub;
 import frc.robot.subsystems.WristRotSub;
@@ -123,20 +124,21 @@ public class RobotContainer {
     JoystickButton changeDrive = new JoystickButton(driver, 3);
     JoystickButton driveForward = new JoystickButton(driver, 1);
     JoystickButton resetGyro = new JoystickButton(driver, 4);
-    JoystickButton setVacuum = new JoystickButton(operator, 1);
 
+    JoystickButton setVacuum = new JoystickButton(operator, 1);
     JoystickButton wristCCW = new JoystickButton(operator, 5);
     JoystickButton wristCW = new JoystickButton(operator, 6);
 
     armAngleSub.setDefaultCommand(new SequentialCommandGroup(
-      new HomeArmCommand(armAngleSub),
+      // new HomeArmCommand(armAngleSub),
       new ArmAngleCommand(armAngleSub, operator::getLeftY)
     ));
     // operator::getRightY));
+
     resetGyro.whileTrue(new InstantCommand(driveSub::zeroGyroscope));
     setVacuum.toggleOnTrue(new VacuumCommand(vacSub));
 
-    armOut.whileTrue(new ArmOutCOmmand(armExtendSub));
+    armOut.whileTrue(new ArmOutCommand(armExtendSub));
     armIn.whileTrue(new ArmInCommand(armExtendSub));
 
     wristSubsystem.setDefaultCommand(new WristCommand(wristSubsystem, operator::getRightY));
@@ -149,13 +151,13 @@ public class RobotContainer {
             driveSub));
 
     wristCW.whileTrue(new StartEndCommand(
-      () -> wristRotSub.setWrist(.1),
+      () -> wristRotSub.setWrist(.15),
       () -> wristRotSub.setWrist(0),
       wristRotSub
     ));
 
     wristCCW.whileTrue(new StartEndCommand(
-      () -> wristRotSub.setWrist(-.1),
+      () -> wristRotSub.setWrist(-.15),
       () -> wristRotSub.setWrist(0),
       wristRotSub
     ));
@@ -174,6 +176,10 @@ public class RobotContainer {
   // public void updateOdometry() {
   // driveSub.updateOdo();
   // }
+
+  // public Command getExtendCommand() {
+  //   return new AutoArmCommand(armExtendSub).withTimeout(7);
+  // };
 
   private static double deadband(double value, double deadband) {
     if (Math.abs(value) > deadband) {
@@ -226,7 +232,14 @@ public class RobotContainer {
   }
 
   public Command getDriveCommand() {
-    return driveAuto.getPath("Devin");
+    return new SequentialCommandGroup(
+
+      // new StartEndCommand(() -> driveSub.drive(new ChassisSpeeds(1.5, 0, 0)),
+      // () -> driveSub.drive(new ChassisSpeeds(0, 0, 0)),
+      // driveSub).withTimeout(4),
+
+      new ABCommand(driveSub)
+    );
   }
 
   public ArmAngleSubsytem getArmAngleSub() {

@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.ArmCommands.AutoArmCommand;
 import frc.robot.subsystems.DriveTrainSubsystems;
 import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
 
@@ -47,6 +48,7 @@ import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
 public class Robot extends TimedRobot {
   private Command autoBalance;
   private Command drive;
+  public Command autoArmExtend;
 
   private RobotContainer robotContainer;
   // private final I2C.Port i2cport = I2C.Port.kOnboard;
@@ -66,16 +68,9 @@ public class Robot extends TimedRobot {
     robotContainer = new RobotContainer();
     drive = robotContainer.getDriveCommand();
 
-    // cMatch.addColorMatch(kBlueTarget);
-    // cMatch.addColorMatch(kRedTarget);
+    ArmAngleSubsytem armAngleSubsytem = robotContainer.getArmAngleSub();
+    armAngleSubsytem.stopArm();
 
-    // cMatch.setConfidenceThreshold(0.96);
-    // PortForwarder.add(5800, "limelight.local", 5800);
-    // PortForwarder.add(5801, "limelight.local", 5801);
-    // PortForwarder.add(5802, "limelight.local", 5802);
-    // PortForwarder.add(5803, "limelight.local", 5803);
-    // PortForwarder.add(5804, "limelight.local", 5804);
-    // PortForwarder.add(5805, "limelight.local", 5805);
 
   }
 
@@ -100,14 +95,13 @@ public class Robot extends TimedRobot {
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    
     // robotContainer.updateOdometry();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    ArmAngleSubsytem armAngleSubsytem = robotContainer.getArmAngleSub();
-    armAngleSubsytem.stopArm();
 
     DriveTrainSubsystems driveSub = robotContainer.getDriveSub();
     driveSub.drive(new ChassisSpeeds(1, 0, 0));
@@ -132,11 +126,15 @@ public class Robot extends TimedRobot {
     // autoBalance.schedule();
     // }
 
+    // autoArmExtend = robotContainer.getExtendCommand();
+
     if (drive != null) {
       drive.schedule();
     }
 
-  
+    // if(autoArmExtend != null) {
+    //   autoArmExtend.schedule();
+    // }
 
   }
 

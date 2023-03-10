@@ -24,39 +24,39 @@ import frc.robot.Constants.*;
 public class DriveAuto {
     DriveTrainSubsystems driveSub;
     PIDController thetaController;
-    PIDController xController = new PIDController(Constants.AutoConstants.PIDXP, Constants.AutoConstants.PIDXI, Constants.AutoConstants.PIDXD);
-    PIDController yController = new PIDController(Constants.AutoConstants.PIDYP, Constants.AutoConstants.PIDYI, Constants.AutoConstants.PIDYP);
+    PIDController xController = new PIDController(Constants.AutoConstants.PIDXP, Constants.AutoConstants.PIDXI,
+            Constants.AutoConstants.PIDXD);
+    PIDController yController = new PIDController(Constants.AutoConstants.PIDYP, Constants.AutoConstants.PIDYI,
+            Constants.AutoConstants.PIDYP);
 
     public DriveAuto(DriveTrainSubsystems d) {
         driveSub = d;
-        thetaController = new PIDController(Constants.AutoConstants.thetaP, Constants.AutoConstants.thetaI, Constants.AutoConstants.thetaI);//.4
+        thetaController = new PIDController(Constants.AutoConstants.thetaP, Constants.AutoConstants.thetaI,
+                Constants.AutoConstants.thetaI);// .4
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     public PathPlannerTrajectory loadPath(String name) {
         return PathPlanner.loadPath(
-            name, 
-            Constants.AutoConstants.maxAccelerationMetersPerSecond, 
-            Constants.AutoConstants.maxAccelerationMetersPerSecondSquared,
-            false);
+                name,
+                Constants.AutoConstants.maxAccelerationMetersPerSecond,
+                Constants.AutoConstants.maxAccelerationMetersPerSecondSquared,
+                false);
     }
-
 
     public Command getPath(String name) {
-        Consumer<SwerveModuleState[]> consumer = a -> driveSub.getModules();
+        Consumer<SwerveModuleState[]> consumer = a -> driveSub.getModuleStates();
         PPSwerveControllerCommand command = new PPSwerveControllerCommand(
-        loadPath(name),
-        driveSub::getPose,
-        Constants.m_kinematics,
-        xController,
-        yController,
-        thetaController,
-        consumer,
-        driveSub); 
+                loadPath(name),
+                driveSub::getPose,
+                Constants.m_kinematics,
+                xController,
+                yController,
+                thetaController,
+                consumer,
+                driveSub);
 
         // Run path following command, then stop at the end.
-        return command.andThen(() -> driveSub.drive(new ChassisSpeeds(0,0,0)));
+        return command.andThen(() -> driveSub.drive(new ChassisSpeeds(.01, 0, 0)));
     }
 }
-
-

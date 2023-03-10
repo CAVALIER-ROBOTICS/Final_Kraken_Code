@@ -65,8 +65,8 @@ public final class Falcon500DriveControllerFactoryBuilder {
 
             motor.setNeutralMode(NeutralMode.Brake);
 
-            // motor.setInverted(mechConfiguration.isDriveInverted() ? TalonFXInvertType.Clockwise : TalonFXInvertType.CounterClockwise);
-            motor.setSensorPhase(true);
+            motor.setInverted(mechConfiguration.isDriveInverted() ? TalonFXInvertType.Clockwise : TalonFXInvertType.CounterClockwise);
+            // motor.setSensorPhase(true);
 
             // Reduce CAN status frame rates
             CtreUtils.checkCtreError(
