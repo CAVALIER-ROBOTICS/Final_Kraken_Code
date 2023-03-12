@@ -93,7 +93,7 @@ public class RobotContainer {
     // server.setFPS(30);
     // server.setCompression(0);
     // server.setSource(camera);
-  
+
     SmartDashboard.putNumber("Hood Angle input", 14);
     SmartDashboard.putNumber("RPM input", .2);
 
@@ -131,9 +131,8 @@ public class RobotContainer {
     JoystickButton wristCW = new JoystickButton(operator, 6);
 
     armAngleSub.setDefaultCommand(new SequentialCommandGroup(
-      // new HomeArmCommand(armAngleSub),
-      new ArmAngleCommand(armAngleSub, operator::getLeftY)
-    ));
+        // new HomeArmCommand(armAngleSub),
+        new ArmAngleCommand(armAngleSub, operator::getLeftY)));
     // operator::getRightY));
 
     resetGyro.whileTrue(new InstantCommand(driveSub::zeroGyroscope));
@@ -152,16 +151,14 @@ public class RobotContainer {
             driveSub));
 
     wristCW.whileTrue(new StartEndCommand(
-      () -> wristRotSub.setWrist(.3),
-      () -> wristRotSub.setWrist(0),
-      wristRotSub
-    ));
+        () -> wristRotSub.setWrist(.3),
+        () -> wristRotSub.setWrist(0),
+        wristRotSub));
 
     wristCCW.whileTrue(new StartEndCommand(
-      () -> wristRotSub.setWrist(-.3),
-      () -> wristRotSub.setWrist(0),
-      wristRotSub
-    ));
+        () -> wristRotSub.setWrist(-.3),
+        () -> wristRotSub.setWrist(0),
+        wristRotSub));
 
     // vacTrigger.whileTrue(new ArmExtendCommand(armExtendSub, () ->
     // getShouldNegate(driver)));
@@ -179,7 +176,7 @@ public class RobotContainer {
   // }
 
   // public Command getExtendCommand() {
-  //   return new AutoArmCommand(armExtendSub).withTimeout(7);
+  // return new AutoArmCommand(armExtendSub).withTimeout(7);
   // };
 
   private static double deadband(double value, double deadband) {
@@ -195,9 +192,9 @@ public class RobotContainer {
   }
 
   // public Command getArmUp (
-  //   return new SequentialCommandGroup(
-      
-  //   )
+  // return new SequentialCommandGroup(
+
+  // )
   // )
 
   private static double modifyAxis(double value) {
@@ -235,17 +232,18 @@ public class RobotContainer {
   public Command getDriveCommand() {
     return new SequentialCommandGroup(
 
-      new InstantCommand(driveSub::zeroGyroscope),
+        new InstantCommand(driveSub::zeroGyroscope),
 
-      new RunCommand(() -> driveSub.drive(new ChassisSpeeds(.75, 0, 0)), driveSub).withTimeout(4),
+        new RunCommand(() -> driveSub.drive(new ChassisSpeeds(.75, 0, 0)), driveSub).withTimeout(4),
 
-      new InstantCommand(() -> driveSub.drive(new ChassisSpeeds(0, 0, 0)))
+        new InstantCommand(() -> driveSub.drive(new ChassisSpeeds(0, 0, 0)))
 
-      // new StartEndCommand(() -> driveSub.drive(new ChassisSpeeds(1.5, 0, 0)),
-      // () -> driveSub.drive(new ChassisSpeeds(0, 0, 0)),
-      // driveSub).withTimeout(4),
+    // new StartEndCommand(() -> driveSub.drive(new ChassisSpeeds(1.5, 0, 0)),
+    // () -> driveSub.drive(new ChassisSpeeds(0, 0, 0)),
+    // driveSub).withTimeout(4),
 
-      // new ABCommand(driveSub)
+    // new ABCommand(driveSub)
+    
     );
   }
 
