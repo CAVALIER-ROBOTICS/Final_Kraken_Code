@@ -10,6 +10,7 @@ import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
 public class ArmOutCommand extends CommandBase {
   /** Creates a new ArmInCommand. */
   ArmExtendSubsystem armExtendSubsystem;
+
   public ArmOutCommand(ArmExtendSubsystem armSub) {
     armExtendSubsystem = armSub;
     addRequirements(armExtendSubsystem);
@@ -24,7 +25,8 @@ public class ArmOutCommand extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -35,6 +37,8 @@ public class ArmOutCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    //Low = all the way out :)
+    return armExtendSubsystem.getIsAtLow();
+    // return false;
   }
 }

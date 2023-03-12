@@ -28,7 +28,7 @@ public class WristCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    wristSubsystem.setWrist(dubSubLol.getAsDouble() * .1);
+    wristSubsystem.setWrist(dubSubLol.getAsDouble() * -.3);
   }
 
   // Called once the command ends or is interrupted.

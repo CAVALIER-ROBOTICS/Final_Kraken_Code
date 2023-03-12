@@ -24,38 +24,13 @@ public class VacuumSubsystem extends SubsystemBase {
 
   /** Creates a new VacuumSubsystem. */
   public VacuumSubsystem() {
-
+    m1.enableVoltageCompensation(true);
+    m2.enableVoltageCompensation(true);
   }
 
   public void setAll(double percentage) {
     m1.set(ControlMode.PercentOutput, percentage);
     m2.set(ControlMode.PercentOutput, percentage);
-    // m3.set(ControlMode.PercentOutput, percentage);
-  }
-
-  public void set(double percentage, motors motorType) {
-    if (motorType == motors.M1) {
-      m1.set(ControlMode.PercentOutput, percentage);
-    }
-    if (motorType == motors.M2) {
-      m2.set(ControlMode.PercentOutput, percentage);
-    }
-    // if (motorType == motors.M3) {
-    // m3.set(ControlMode.PercentOutput, percentage);
-    // }
-  }
-
-  public double getMotorCurrent(motors motorType) {
-    if (motorType == motors.M1) {
-    return m1.getOutputCurrent();
-    }
-    if (motorType == motors.M2) {
-      return m2.getOutputCurrent();
-    }
-    // if (motorType == motors.M3) {
-    //   return m3.getOutputCurrent();
-    // }
-    return 0;
   }
 
   @Override

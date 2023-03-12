@@ -17,6 +17,7 @@ public class WristRotSub extends SubsystemBase {
 
   public void setWrist(double setpoint) {
     wristRotMotor.set(setpoint);
+    wristRotMotor.enableVoltageCompensation(Constants.NOMINAL_VOLTAGE);
   }
 
 

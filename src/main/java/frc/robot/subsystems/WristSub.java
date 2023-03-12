@@ -28,7 +28,7 @@ public class WristSub extends SubsystemBase {
     wristPID.setI(0.0);
     wristPID.setD(0.0);
 
-    wristMotor.enableVoltageCompensation(12.3);
+    wristMotor.enableVoltageCompensation(Constants.NOMINAL_VOLTAGE);
   }
 
   public void setAngle() {

@@ -198,9 +198,9 @@ public final class TorqueSwerveModule2022 extends TorqueSwerveModule {
                     optimized.speedMetersPerSecond);
             final double driveFFOutput = driveFeedForward.calculate(optimized.speedMetersPerSecond);
             log("Drive PID Output", drivePIDOutput + driveFFOutput);
-            drive.set(ControlMode.PercentOutput, drivePIDOutput + driveFFOutput);
+            drive.set(ControlMode.PercentOutput, -(drivePIDOutput + driveFFOutput));
         } else {
-            drive.set(ControlMode.PercentOutput, optimized.speedMetersPerSecond / config.maxVelocity);
+            drive.set(ControlMode.PercentOutput, -(optimized.speedMetersPerSecond / config.maxVelocity));
         }
 
         // Calculate turn output

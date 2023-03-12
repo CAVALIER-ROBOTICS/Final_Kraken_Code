@@ -28,36 +28,13 @@ public class VacuumCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    vacSub.setAll(setpoint);
     RobotContainer.operator.setRumble(RumbleType.kBothRumble, 1);
-    timer.start();
-    timer.reset();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // if ((vacSub.getMotorCurrent(motors.M2) < 9 || vacSub.getMotorCurrent(motors.M2) < 9
-    //     || vacSub.getMotorCurrent(motors.M3) < 9) && timer.get() > 2.5) {
-
-    //   if (vacSub.getMotorCurrent(motors.M1) > 9) {
-    //     vacSub.set(0.0, motors.M1);
-    //   }
-
-    //   if (vacSub.getMotorCurrent(motors.M2) > 9) {
-    //     vacSub.set(0.0, motors.M2);
-    //   }
-
-    //   if (vacSub.getMotorCurrent(motors.M3) > 9) {
-    //     vacSub.set(0.0, motors.M3);
-    //   }
-    // } else {
-    //   vacSub.setAll(setpoint);
-    // }
-
-    SmartDashboard.putNumber("M1 voltage", vacSub.getMotorCurrent(motors.M1));
-    SmartDashboard.putNumber("M2 voltage", vacSub.getMotorCurrent(motors.M2));
-    SmartDashboard.putNumber("M3 voltage", vacSub.getMotorCurrent(motors.M3));
+    vacSub.setAll(.6);
   }
 
   // Called once the command ends or is interrupted.
@@ -65,7 +42,6 @@ public class VacuumCommand extends CommandBase {
 
   public void end(boolean interrupted) {
     vacSub.setAll(0.0);
-    timer.stop();
     RobotContainer.operator.setRumble(RumbleType.kBothRumble, 0);
   }
 

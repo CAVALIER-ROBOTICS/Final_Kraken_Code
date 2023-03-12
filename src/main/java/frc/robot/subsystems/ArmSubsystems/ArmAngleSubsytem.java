@@ -33,23 +33,12 @@ public class ArmAngleSubsytem extends SubsystemBase {
   DigitalInput limitSwitch = new DigitalInput(9);
 
   public ArmAngleSubsytem() {
-    // angleMotorLeft.restoreFactoryDefaults();
-    // angleMotorLeft.setIdleMode(IdleMode.kBrake);
-
-    // angleMotorRight.restoreFactoryDefaults();
-    // angleMotorRight.setIdleMode(IdleMode.kBrake);
-
-    // angleMotorLeft.setInverted(true);
-    // angleMotorRight.setInverted(false);
-
-    // anglePIDRight.setP(.2);
-    // anglePIDRight.setI(0);
-    // anglePIDRight.setD(0);
-
     angleMotorLeft.restoreFactoryDefaults();
     angleMotorRight.restoreFactoryDefaults();
 
     angleMotorRight.follow(angleMotorLeft, true);
+    angleMotorRight.enableVoltageCompensation(Constants.NOMINAL_VOLTAGE);
+    angleMotorLeft.enableVoltageCompensation(Constants.NOMINAL_VOLTAGE);
   }
 
   public void setVoltage(double x) {

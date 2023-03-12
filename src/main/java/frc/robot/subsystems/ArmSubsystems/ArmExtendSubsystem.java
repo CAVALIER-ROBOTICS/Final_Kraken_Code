@@ -37,6 +37,7 @@ public class ArmExtendSubsystem extends SubsystemBase {
     extendMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
 
     extendMotor.setOpenLoopRampRate(0.25); //.25 seconds till full throttle of extension speed
+    extendMotor.enableVoltageCompensation(Constants.NOMINAL_VOLTAGE);
   }
 
   public void setExtend(double x) {

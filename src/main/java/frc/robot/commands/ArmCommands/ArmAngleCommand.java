@@ -31,7 +31,7 @@ public class ArmAngleCommand extends CommandBase {
   @Override
   public void execute() {
     if (Math.abs(dubsup.getAsDouble()) >= .1) {
-      double setpoint = (dubsup.getAsDouble() * .5);
+      double setpoint = (dubsup.getAsDouble() * -.4);
       armAngleSub.setPercentage(setpoint);
       SmartDashboard.putNumber("SetpointMotor", setpoint);
     } else {
@@ -54,6 +54,7 @@ public class ArmAngleCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    // return armAngleSub.isAtLow();
     return false;
   }
 }

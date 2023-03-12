@@ -79,8 +79,8 @@ public class RobotContainer {
   // Trigger vacTrigger = new Trigger(() -> getRightTrigger(driver));
   // Trigger armextTrigger = new Trigger(() -> getRightTrigger(operator));
 
-  Trigger armIn = new Trigger(() -> getRightTrigger(operator));
-  Trigger armOut = new Trigger(() -> getLeftTrigger(operator));
+  Trigger armIn = new Trigger(() -> getLeftTrigger(operator));
+  Trigger armOut = new Trigger(() -> getRightTrigger(operator));
 
   VacuumSubsystem vacSub = new VacuumSubsystem();
 
@@ -119,11 +119,12 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-
     // JoystickButton reset = new JoystickButton(driver, 4);
     JoystickButton changeDrive = new JoystickButton(driver, 3);
     JoystickButton driveForward = new JoystickButton(driver, 1);
     JoystickButton resetGyro = new JoystickButton(driver, 4);
+
+    driveForward.whileTrue(new ABCommand(driveSub));
 
     JoystickButton setVacuum = new JoystickButton(operator, 1);
     JoystickButton wristCCW = new JoystickButton(operator, 5);
@@ -151,13 +152,13 @@ public class RobotContainer {
             driveSub));
 
     wristCW.whileTrue(new StartEndCommand(
-      () -> wristRotSub.setWrist(.15),
+      () -> wristRotSub.setWrist(.3),
       () -> wristRotSub.setWrist(0),
       wristRotSub
     ));
 
     wristCCW.whileTrue(new StartEndCommand(
-      () -> wristRotSub.setWrist(-.15),
+      () -> wristRotSub.setWrist(-.3),
       () -> wristRotSub.setWrist(0),
       wristRotSub
     ));
@@ -234,11 +235,17 @@ public class RobotContainer {
   public Command getDriveCommand() {
     return new SequentialCommandGroup(
 
+      new InstantCommand(driveSub::zeroGyroscope),
+
+      new RunCommand(() -> driveSub.drive(new ChassisSpeeds(.75, 0, 0)), driveSub).withTimeout(4),
+
+      new InstantCommand(() -> driveSub.drive(new ChassisSpeeds(0, 0, 0)))
+
       // new StartEndCommand(() -> driveSub.drive(new ChassisSpeeds(1.5, 0, 0)),
       // () -> driveSub.drive(new ChassisSpeeds(0, 0, 0)),
       // driveSub).withTimeout(4),
 
-      new ABCommand(driveSub)
+      // new ABCommand(driveSub)
     );
   }
 

@@ -36,6 +36,7 @@ public final class Constants {
         };
 
         public static final double WHEELRADMM = (3.9 * 2.54) / 2;
+        public static final double NOMINAL_VOLTAGE = 12.3;
         public static final Transform3d CAMERA_TO_ROBOT = new Transform3d(new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)),
                         new Pose3d(0.0, .762, 0.0, new Rotation3d()));
 

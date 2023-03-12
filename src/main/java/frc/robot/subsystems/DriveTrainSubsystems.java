@@ -41,6 +41,7 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
   // Rotation2d.fromDegrees(getFusedHeading()); getRotation2d()
   // Rotation2d.fromDegrees(pidgey.getCompassHeading()
   private final SwerveDriveOdometry odo;
+  public final Field2d field = new Field2d();
 
   // These are the modules initialize them in the constructor.
   private final TorqueSwerveModule2022 frontLeftModule;
@@ -110,7 +111,7 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
 
   public void drive(ChassisSpeeds speeds) {
     SwerveModuleState[] states = Constants.m_kinematics.toSwerveModuleStates(speeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, 3);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, 2.75);
 
     frontLeftModule.setDesiredState(states[0]);
     frontRightModule.setDesiredState(states[1]);
@@ -121,6 +122,8 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
 
   @Override
   public void periodic() {
+    SmartDashboard.putData("field", field);
+    field.setRobotPose(getPose());
   }
 
   public void updateOdo() {

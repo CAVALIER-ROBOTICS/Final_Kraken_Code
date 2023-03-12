@@ -27,6 +27,7 @@ public class FieldDriveCommand extends CommandBase {
     rotationSupplier = rot;
 
     addRequirements(d);
+    driveSub.zeroGyroscope();
   }
 
   // Called when the command is initially scheduled.
