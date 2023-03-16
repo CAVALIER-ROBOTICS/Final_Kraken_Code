@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.Drive;
 
 public interface DriveTrainConstants {
 
@@ -37,7 +37,7 @@ public interface DriveTrainConstants {
   public static final int backLeftDriveMotor = 7; // FIXME Set back left drive motor ID
   public static final int backLeftSteerMotor = 8; // FIXME Set back left steer motor ID
   public static final int backLeftSteerEncoder = 53; // FIXME Set back left steer encoder ID
-  public static final double backLeftModuleSteerOffset = 1.523265243062767; // FIXME Measure and set
+  public static final double backLeftModuleSteerOffset = -1.50176415592432; // FIXME Measure and set
   // back left
   // steer
   // offset
@@ -45,7 +45,7 @@ public interface DriveTrainConstants {
   public static final int backRightDriveMotor = 5; // FIXME Set back right drive motor ID
   public static final int backRightSteerMotor = 6; // FIXME Set back right steer motor ID
   public static final int backRightSteerEncoder = 50; // FIXME Set back right steer encoder ID
-  public static final double backRightModuleSteerOffset = 2.679871719573633; // FIXME Measure and set back
+  public static final double backRightModuleSteerOffset = -2.880822796617643; // FIXME Measure and set back
   // right steer offset
 
   public static final int volts = 12;

@@ -97,6 +97,15 @@ public final class Constants {
         // public static final TrapezoidProfile.Constraints thetaControllerConstraints =
         // new TrapezoidProfile.Constraints(maxAngularSpeed, maxAngularAcceleration);
 
+        public class AutoBalanceConfig {
+                public static final double balancedAngle = 0; 
+                public static final double kP = 0.007; 
+                public static final double kI = .0001;
+                public static final double kD = .0001;
+                public static final double angleSetPoint = 0; 
+                public static final double kTurn = 0.007; 
+        }
+
         public static final class AutoConstants {
                 public static final double maxSpeedMetersPerSecond = 4;
                 public static final double maxAccelerationMetersPerSecondSquared = 3;

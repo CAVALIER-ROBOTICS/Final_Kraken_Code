@@ -47,4 +47,6 @@ public interface SwerveModule {
     void resetToAbsolute();
 
     void set(double driveVoltage, double steerAngle);
+
+    // void setDesiredState(SwerveModuleState swerveModuleState, boolean isOpenLoop);
 }

@@ -8,14 +8,14 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
+import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsystem;
 
 public class ArmAngleCommand extends CommandBase {
   /** Creates a new ArmAngleCommand. */
-  ArmAngleSubsytem armAngleSub;
+  ArmAngleSubsystem armAngleSub;
   DoubleSupplier dubsup;
 
-  public ArmAngleCommand(ArmAngleSubsytem a, DoubleSupplier d) {
+  public ArmAngleCommand(ArmAngleSubsystem a, DoubleSupplier d) {
     // Use addRequirements() here to declare subsystem dependencies.
     armAngleSub = a;
     dubsup = d;
@@ -24,8 +24,7 @@ public class ArmAngleCommand extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -54,7 +53,6 @@ public class ArmAngleCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // return armAngleSub.isAtLow();
     return false;
   }
 }

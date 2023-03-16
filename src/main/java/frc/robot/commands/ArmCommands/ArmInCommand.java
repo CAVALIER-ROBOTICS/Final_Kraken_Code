@@ -37,7 +37,7 @@ public class ArmInCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return armExtendSubsystem.getIsAtHigh();
-    // return false;
+    // return armExtendSubsystem.getIsAtHigh();
+    return false;
   }
 }

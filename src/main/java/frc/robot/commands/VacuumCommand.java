@@ -15,11 +15,13 @@ import frc.robot.subsystems.VacuumSubsystems.VacuumSubsystem.motors;
 public class VacuumCommand extends CommandBase {
   VacuumSubsystem vacSub;
   Double setpoint = .4;
+  int gamePiece = 0;
   Timer timer = new Timer();
 
   /** Creates a new VacuumCommand. */
-  public VacuumCommand(VacuumSubsystem vSub) {
+  public VacuumCommand(VacuumSubsystem vSub, int gP) {
     vacSub = vSub;
+    gamePiece = gP;
     addRequirements(vacSub);
     
     // Use addRequirements() here to declare subsystem dependencies.
@@ -34,7 +36,14 @@ public class VacuumCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    vacSub.setAll(.6);
+    switch(gamePiece) {
+      case 1:
+      //cone
+      vacSub.setAll(.6);
+      //cube
+      case -1:
+      vacSub.setAll(.3);
+    }
   }
 
   // Called once the command ends or is interrupted.

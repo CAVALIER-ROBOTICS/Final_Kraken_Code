@@ -22,7 +22,7 @@ public class ArmExtendSubsystem extends SubsystemBase {
   private RelativeEncoder extendEncoder = extendMotor.getEncoder();
   private SparkMaxPIDController extendPID = extendMotor.getPIDController();
   DigitalInput highExtremeDigitalInput = new DigitalInput(8);
-  DigitalInput lowExtremeDigitalInput = new DigitalInput(7);
+  DigitalInput lowExtremeDigitalInput = new DigitalInput(9);
   
   public ArmExtendSubsystem() {
     extendMotor.restoreFactoryDefaults();

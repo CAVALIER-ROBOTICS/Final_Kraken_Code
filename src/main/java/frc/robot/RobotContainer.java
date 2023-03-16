@@ -28,24 +28,27 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.VacuumCommand;
 import frc.robot.commands.ArmCommands.ArmAngleCommand;
 import frc.robot.commands.ArmCommands.ArmInCommand;
 import frc.robot.commands.ArmCommands.ArmOutCommand;
 import frc.robot.commands.ArmCommands.AutoArmCommand;
-import frc.robot.commands.ArmCommands.HomeArmCommand;
+// import frc.robot.commands.ArmCommands.HomeArmCommand;
 import frc.robot.commands.DriveCommands.ABCommand;
 import frc.robot.commands.DriveCommands.FieldDriveCommand;
 import frc.robot.commands.DriveCommands.RobotDriveCommand;
 import frc.robot.commands.DriveCommands.TestMotorCommand;
+import frc.robot.commands.SetPoints.ArmCommand;
+import frc.robot.commands.SetPoints.ExtendCommand;
 import frc.robot.commands.WristCommands.WristCommand;
-import frc.robot.subsystems.DriveTrainSubsystems;
 import frc.robot.subsystems.TestMotorSub;
 import frc.robot.subsystems.WristRotSub;
 import frc.robot.subsystems.WristSub;
-import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsytem;
+import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsystem;
 import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
+import frc.robot.subsystems.Drive.DriveTrainSubsystems;
 import frc.robot.subsystems.VacuumSubsystems.VacuumSubsystem;
 
 /**
@@ -65,8 +68,9 @@ public class RobotContainer {
   UsbCamera camera;
 
   DriveTrainSubsystems driveSub = new DriveTrainSubsystems();
-  ArmAngleSubsytem armAngleSub = new ArmAngleSubsytem();
+  ArmAngleSubsystem armAngleSub = new ArmAngleSubsystem();
   ArmExtendSubsystem armExtendSub = new ArmExtendSubsystem();
+
   TestMotorSub testSub = new TestMotorSub();
   WristRotSub wristRotSub = new WristRotSub();
 
@@ -94,8 +98,8 @@ public class RobotContainer {
     // server.setCompression(0);
     // server.setSource(camera);
 
-    SmartDashboard.putNumber("Hood Angle input", 14);
-    SmartDashboard.putNumber("RPM input", .2);
+    HttpCamera limelightFeed = new HttpCamera("limelight-cavbot", "http://10.74.92.101:5800", HttpCameraKind.kMJPGStreamer);
+    CameraServer.startAutomaticCapture(limelightFeed);
 
     driveSub.setDefaultCommand(
         new FieldDriveCommand(
@@ -126,9 +130,20 @@ public class RobotContainer {
 
     driveForward.whileTrue(new ABCommand(driveSub));
 
-    JoystickButton setVacuum = new JoystickButton(operator, 1);
+    JoystickButton setVacuumCone = new JoystickButton(operator, 1);
+    JoystickButton setVacuumCube = new JoystickButton(operator, 2);
+
     JoystickButton wristCCW = new JoystickButton(operator, 5);
     JoystickButton wristCW = new JoystickButton(operator, 6);
+
+    POVButton armUp = new POVButton(operator, 0);
+
+    armUp.onTrue(new ArmCommand(armAngleSub));
+
+    // armUp.onTrue(new SequentialCommandGroup(
+    //   new ArmCommand(armAngleSub),
+    //   new ExtendCommand(armExtendSub)
+    // ));
 
     armAngleSub.setDefaultCommand(new SequentialCommandGroup(
         // new HomeArmCommand(armAngleSub),
@@ -136,7 +151,10 @@ public class RobotContainer {
     // operator::getRightY));
 
     resetGyro.whileTrue(new InstantCommand(driveSub::zeroGyroscope));
-    setVacuum.toggleOnTrue(new VacuumCommand(vacSub));
+
+    setVacuumCone.toggleOnTrue(new VacuumCommand(vacSub, 1));
+    setVacuumCube.toggleOnFalse(new VacuumCommand(vacSub, -1));
+
 
     armOut.whileTrue(new ArmOutCommand(armExtendSub));
     armIn.whileTrue(new ArmInCommand(armExtendSub));
@@ -191,12 +209,6 @@ public class RobotContainer {
     }
   }
 
-  // public Command getArmUp (
-  // return new SequentialCommandGroup(
-
-  // )
-  // )
-
   private static double modifyAxis(double value) {
     // Deadband
     value = deadband(value, 0.08);
@@ -209,21 +221,6 @@ public class RobotContainer {
   public DriveTrainSubsystems getDriveSub() {
     return driveSub;
   }
-  // private static boolean getUpDPad() {
-  // return operator.getPOV() == 0;
-  // }
-
-  // private static boolean getRightDPad() {
-  // return operator.getPOV() == 90;
-  // }
-
-  // private static boolean getDownDPad() {
-  // return operator.getPOV() == 180;
-  // }
-
-  // private static boolean getLeftDPad() {
-  // return operator.getPOV() == 270;
-  // }
 
   private static boolean getRightTrigger(XboxController controller) {
     return controller.getRightTriggerAxis() > 0.05;
@@ -234,7 +231,7 @@ public class RobotContainer {
 
         new InstantCommand(driveSub::zeroGyroscope),
 
-        new RunCommand(() -> driveSub.drive(new ChassisSpeeds(.75, 0, 0)), driveSub).withTimeout(4),
+        new RunCommand(() -> driveSub.drive(new ChassisSpeeds(.75, 0, 0)), driveSub).withTimeout(3.256976420890),
 
         new InstantCommand(() -> driveSub.drive(new ChassisSpeeds(0, 0, 0)))
 
@@ -247,9 +244,10 @@ public class RobotContainer {
     );
   }
 
-  public ArmAngleSubsytem getArmAngleSub() {
+  public ArmAngleSubsystem getArmAngleSub() {
     return armAngleSub;
   }
+
 
   private static boolean getShouldNegate(XboxController controller) {
     return controller.getRightTriggerAxis() < controller.getLeftTriggerAxis();
