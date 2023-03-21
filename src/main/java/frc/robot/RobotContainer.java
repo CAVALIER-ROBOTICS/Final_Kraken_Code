@@ -130,8 +130,8 @@ public class RobotContainer {
 
     driveForward.whileTrue(new ABCommand(driveSub));
 
-    JoystickButton setVacuumCone = new JoystickButton(operator, 1);
-    JoystickButton setVacuumCube = new JoystickButton(operator, 2);
+    JoystickButton setVacuumCone = new JoystickButton(operator, 2);
+    JoystickButton setVacuumCube = new JoystickButton(operator, 1);
 
     JoystickButton wristCCW = new JoystickButton(operator, 5);
     JoystickButton wristCW = new JoystickButton(operator, 6);
@@ -244,9 +244,9 @@ public class RobotContainer {
     );
   }
 
-  public ArmAngleSubsystem getArmAngleSub() {
-    return armAngleSub;
-  }
+  // public ArmAngleSubsystem getArmAngleSub() {
+  //   return armAngleSub;
+  // }
 
 
   private static boolean getShouldNegate(XboxController controller) {
