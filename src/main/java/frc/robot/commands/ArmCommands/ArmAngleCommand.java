@@ -39,8 +39,6 @@ public class ArmAngleCommand extends CommandBase {
       armAngleSub.stopArm();
     }
 
-    // armAngleSub.setAnglePosition(-110);
-    // SmartDashboard.putNumber("ArmAngle", armAngleSub.getAngle());
   }
 
   // Called once the command ends or is interrupted.

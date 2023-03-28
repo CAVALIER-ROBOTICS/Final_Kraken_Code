@@ -24,24 +24,29 @@ public class WristSub extends SubsystemBase {
 
   /** Creates a new WristSub. */
   public WristSub() {
-    wristPID.setP(0.0);
-    wristPID.setI(0.0);
+    wristPID.setP(0.001);
+    wristPID.setI(0.0025);
     wristPID.setD(0.0);
 
     wristMotor.enableVoltageCompensation(Constants.NOMINAL_VOLTAGE);
+    wristEncoder.setPosition(0.0);
   }
 
-  public void setAngle() {
-    double encoderPos = wristEncoder.getPosition() / Constants.WRIST_MAX * 50;
+  public void setAngle(double angle) {
+    double encoderPos = angle / Constants.WRIST_MAX * 50;
     wristPID.setReference(encoderPos, ControlType.kPosition);
   }
 
   public double getAngle() {
-    return wristEncoder.getPosition() * 360 / 50;
+    return wristEncoder.getPosition() * Constants.WRIST_MAX / 50;
   }
 
   public void setWrist(double percentage) {
     wristMotor.set(percentage);
+  }
+
+  public void stopWrist() {
+    setAngle(getAngle());
   }
 
   public void zeroWrist() {

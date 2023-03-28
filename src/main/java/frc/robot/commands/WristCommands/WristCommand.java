@@ -28,7 +28,13 @@ public class WristCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    wristSubsystem.setWrist(dubSubLol.getAsDouble() * -.3);
+    double input = dubSubLol.getAsDouble();
+
+    if(Math.abs(input) > .3) {
+      wristSubsystem.setWrist(dubSubLol.getAsDouble() * -.3);
+    } else {
+      wristSubsystem.stopWrist();
+    }
   }
 
   // Called once the command ends or is interrupted.

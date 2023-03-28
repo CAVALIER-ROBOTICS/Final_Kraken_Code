@@ -7,12 +7,14 @@ package frc.robot.commands.SetPoints;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
 
-public class ExtendCommand extends CommandBase {
+public class ExtendScoring extends CommandBase {
   /** Creates a new ExtendCommand. */
     ArmExtendSubsystem armExtendSubsystem;
+    int location;
 
-    public ExtendCommand(ArmExtendSubsystem armSub) {
+    public ExtendScoring(ArmExtendSubsystem armSub, int loc) {
       armExtendSubsystem = armSub;
+      location = loc;
       addRequirements(armExtendSubsystem);
       // Use addRequirements() here to declare subsystem dependencies.
     }
@@ -20,7 +22,16 @@ public class ExtendCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armExtendSubsystem.setPercentage(.4);
+    switch(location) {
+      case 1:
+      //high
+      armExtendSubsystem.zeroPos();
+      armExtendSubsystem.setExtendePosition(70);
+      //middle
+      case -1:
+      armExtendSubsystem.zeroPos();
+      armExtendSubsystem.setExtendePosition(35);
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -29,13 +40,11 @@ public class ExtendCommand extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    armExtendSubsystem.setPercentage(0.0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return armExtendSubsystem.getIsAtLow();
+    return false;
   }
 }

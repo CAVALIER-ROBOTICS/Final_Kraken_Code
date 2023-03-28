@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.ArmSubsystems;
 
 import com.revrobotics.CANSparkMax;
@@ -34,7 +30,7 @@ public class ArmAngleSubsystem extends SubsystemBase {
 
   private SparkMaxPIDController anglePIDLeft = angleMotorLeft.getPIDController();
 
-  DigitalInput limitSwitch = new DigitalInput(5);
+  DigitalInput limitSwitch = new DigitalInput(7);
 
   public ArmAngleSubsystem() {
     angleMotorLeft.restoreFactoryDefaults();
@@ -44,7 +40,8 @@ public class ArmAngleSubsystem extends SubsystemBase {
     angleMotorRight.enableVoltageCompensation(Constants.NOMINAL_VOLTAGE);
     angleMotorLeft.enableVoltageCompensation(Constants.NOMINAL_VOLTAGE);
 
-    angleEncoderLeft.setPositionConversionFactor(.01);
+    // angleEncoderLeft.setPositionConversionFactor(.01);
+    angleEncoderLeft.setPosition(0.0);
   }
 
   public void setVoltage(double x) {
@@ -57,11 +54,11 @@ public class ArmAngleSubsystem extends SubsystemBase {
     return (angleMotorLeft.getOutputCurrent() + angleMotorRight.getOutputCurrent()) / 2;
   }
 
-  public void setAnnglePosition(double setpoint) {
-    anglePIDLeft.setP(.02);
-    anglePIDLeft.setI(0.000001);
+  public void setAnglePosition(double setpoint) {
+    anglePIDLeft.setP(.04); //.02
+    anglePIDLeft.setI(0.0001); //0.0001
     anglePIDLeft.setD(0);
-    anglePIDLeft.setFF(.0004);
+    anglePIDLeft.setFF(.0004); 
     
     double encoderRot = (setpoint + 10) / Constants.ARM_MAX * 50;
     anglePIDLeft.setReference(encoderRot, CANSparkMax.ControlType.kPosition);
@@ -84,7 +81,8 @@ public class ArmAngleSubsystem extends SubsystemBase {
 
   public double getAngle() {
     // return (angleEncoderLeft.getPosition() * (2.0 * Math.PI / 100));
-    return angleEncoderLeft.getPosition(); 
+    // return angleEncoderLeft.getPosition(); 
+    return angleEncoderLeft.getPosition() * Constants.ARM_MAX / 50;
   }
 
   public void resetEncoder() {

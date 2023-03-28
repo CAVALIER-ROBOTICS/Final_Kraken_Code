@@ -4,23 +4,19 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.cscore.HttpCamera;
-import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.util.ErrorMessages;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -28,20 +24,14 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.VacuumCommand;
 import frc.robot.commands.ArmCommands.ArmAngleCommand;
 import frc.robot.commands.ArmCommands.ArmInCommand;
 import frc.robot.commands.ArmCommands.ArmOutCommand;
-import frc.robot.commands.ArmCommands.AutoArmCommand;
-// import frc.robot.commands.ArmCommands.HomeArmCommand;
-import frc.robot.commands.DriveCommands.ABCommand;
+import frc.robot.commands.DriveCommands.ABV2Command;
 import frc.robot.commands.DriveCommands.FieldDriveCommand;
-import frc.robot.commands.DriveCommands.RobotDriveCommand;
-import frc.robot.commands.DriveCommands.TestMotorCommand;
-import frc.robot.commands.SetPoints.ArmCommand;
-import frc.robot.commands.SetPoints.ExtendCommand;
+import frc.robot.commands.SetPoints.ExtendScoring;
 import frc.robot.commands.WristCommands.WristCommand;
 import frc.robot.subsystems.TestMotorSub;
 import frc.robot.subsystems.WristRotSub;
@@ -64,6 +54,9 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public static XboxController driver = new XboxController(0);
   public static XboxController operator = new XboxController(1);
+  public static NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-cavbots"); // TODO move to
+                                                                                                      // dedicated class
+                                                                                                      // lol
 
   UsbCamera camera;
 
@@ -92,13 +85,15 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+
     // camera = CameraServer.startAutomaticCapture();
     // MjpegServer server = new MjpegServer("Camera", 1181);
     // server.setFPS(30);
     // server.setCompression(0);
     // server.setSource(camera);
 
-    HttpCamera limelightFeed = new HttpCamera("limelight-cavbot", "http://10.74.92.101:5800", HttpCameraKind.kMJPGStreamer);
+    HttpCamera limelightFeed = new HttpCamera("limelight-cavbot", "http://10.74.92.101:5800",
+        HttpCameraKind.kMJPGStreamer);
     CameraServer.startAutomaticCapture(limelightFeed);
 
     driveSub.setDefaultCommand(
@@ -107,7 +102,7 @@ public class RobotContainer {
                 DriveTrainSubsystems.maxVelocityPerSecond),
             () -> modifyAxis(driver.getLeftX() *
                 DriveTrainSubsystems.maxVelocityPerSecond),
-            () -> modifyAxis(driver.getRightX() *
+            () -> modifyAxis(-driver.getRightX() *
                 DriveTrainSubsystems.maxAnglarVelocityPerSecond),
             driveSub));
 
@@ -123,12 +118,16 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // JoystickButton reset = new JoystickButton(driver, 4);
+
+    table.getEntry("camMode").setNumber(0);
+    table.getEntry("ledMode").setNumber(0);
+
     JoystickButton changeDrive = new JoystickButton(driver, 3);
-    JoystickButton driveForward = new JoystickButton(driver, 1);
+    JoystickButton babyMode = new JoystickButton(driver, 1);
     JoystickButton resetGyro = new JoystickButton(driver, 4);
 
-    driveForward.whileTrue(new ABCommand(driveSub));
+    // JoystickButton alignBot = new JoystickButton(driver, 6);
+    // JoystickButton alignBotRightmost = new JoystickButton(driver, 5);
 
     JoystickButton setVacuumCone = new JoystickButton(operator, 2);
     JoystickButton setVacuumCube = new JoystickButton(operator, 1);
@@ -136,14 +135,24 @@ public class RobotContainer {
     JoystickButton wristCCW = new JoystickButton(operator, 5);
     JoystickButton wristCW = new JoystickButton(operator, 6);
 
-    POVButton armUp = new POVButton(operator, 0);
+    JoystickButton highScoring = new JoystickButton(operator, 4);
+    JoystickButton middleScoring = new JoystickButton(operator, 3);
 
-    armUp.onTrue(new ArmCommand(armAngleSub));
+    //cones
+    highScoring.whileTrue(new ExtendScoring(armExtendSub, 1));
+    middleScoring.whileTrue(new ExtendScoring(armExtendSub, -1));
 
-    // armUp.onTrue(new SequentialCommandGroup(
-    //   new ArmCommand(armAngleSub),
-    //   new ExtendCommand(armExtendSub)
-    // ));
+    // alignBotRightmost.whileTrue(new InstantCommand(Limelight::setRightmost));
+    // alignBot.toggleOnTrue(new RunCommand(() -> driveSub.autoAlignDrive(driver::getLeftY, driver::getLeftX), driveSub));
+
+    babyMode.toggleOnTrue(new FieldDriveCommand(
+        () -> modifyAxis((driver.getLeftY() *
+            DriveTrainSubsystems.maxVelocityPerSecond) * .25),
+        () -> modifyAxis((driver.getLeftX() *
+            DriveTrainSubsystems.maxVelocityPerSecond) * .20),
+        () -> modifyAxis(-(driver.getRightX() *
+            DriveTrainSubsystems.maxAnglarVelocityPerSecond) * .25),
+        driveSub));
 
     armAngleSub.setDefaultCommand(new SequentialCommandGroup(
         // new HomeArmCommand(armAngleSub),
@@ -154,7 +163,6 @@ public class RobotContainer {
 
     setVacuumCone.toggleOnTrue(new VacuumCommand(vacSub, 1));
     setVacuumCube.toggleOnFalse(new VacuumCommand(vacSub, -1));
-
 
     armOut.whileTrue(new ArmOutCommand(armExtendSub));
     armIn.whileTrue(new ArmInCommand(armExtendSub));
@@ -169,12 +177,12 @@ public class RobotContainer {
             driveSub));
 
     wristCW.whileTrue(new StartEndCommand(
-        () -> wristRotSub.setWrist(.3),
+        () -> wristRotSub.setWrist(.4),
         () -> wristRotSub.setWrist(0),
         wristRotSub));
 
     wristCCW.whileTrue(new StartEndCommand(
-        () -> wristRotSub.setWrist(-.3),
+        () -> wristRotSub.setWrist(-.4),
         () -> wristRotSub.setWrist(0),
         wristRotSub));
 
@@ -192,10 +200,6 @@ public class RobotContainer {
   // public void updateOdometry() {
   // driveSub.updateOdo();
   // }
-
-  // public Command getExtendCommand() {
-  // return new AutoArmCommand(armExtendSub).withTimeout(7);
-  // };
 
   private static double deadband(double value, double deadband) {
     if (Math.abs(value) > deadband) {
@@ -231,23 +235,29 @@ public class RobotContainer {
 
         new InstantCommand(driveSub::zeroGyroscope),
 
-        new RunCommand(() -> driveSub.drive(new ChassisSpeeds(.75, 0, 0)), driveSub).withTimeout(3.256976420890),
+        new RunCommand(() -> driveSub.fieldOrientedDriveNumber(0.0, 1.0, 0.0), driveSub).withTimeout(1.25),
 
-        new InstantCommand(() -> driveSub.drive(new ChassisSpeeds(0, 0, 0)))
+        new InstantCommand(() -> driveSub.drive(new ChassisSpeeds(0, 0, 0))),
+
+        new ABV2Command(driveSub)
 
     // new StartEndCommand(() -> driveSub.drive(new ChassisSpeeds(1.5, 0, 0)),
     // () -> driveSub.drive(new ChassisSpeeds(0, 0, 0)),
     // driveSub).withTimeout(4),
 
     // new ABCommand(driveSub)
-    
+
     );
   }
 
-  // public ArmAngleSubsystem getArmAngleSub() {
-  //   return armAngleSub;
-  // }
+  public Command getAutoDrive() {
+    return new SequentialCommandGroup(
+        driveAuto.getPath("Devin2"));
+  }
 
+  public Command getBalance() {
+    return new ABV2Command(driveSub);
+  }
 
   private static boolean getShouldNegate(XboxController controller) {
     return controller.getRightTriggerAxis() < controller.getLeftTriggerAxis();

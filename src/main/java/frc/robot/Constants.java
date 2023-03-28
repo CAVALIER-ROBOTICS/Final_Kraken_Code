@@ -44,6 +44,7 @@ public final class Constants {
 
         public static final double WRIST_MAX = 360; // TODO get actual values
         public static final double ARM_MAX = 360;
+        public static final double EXTEND_MAX = 180;
 
         public static final int wristID = 44;
 

@@ -13,6 +13,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -48,9 +49,20 @@ public class ArmExtendSubsystem extends SubsystemBase {
     extendMotor.set(setpoint);
   }
 
-  public void setArmExtensionPosition() {
-    extendPID.setReference(extendEncoder.getPosition(), ControlType.kPosition);
+  public void setExtendePosition(double setpoint) {
+    extendPID.setP(.03); //.02
+    extendPID.setI(0.00001); //0.000001
+    extendPID.setD(0);
+    extendPID.setFF(.0004);
+
+    double extendEncoder = setpoint;
+    extendPID.setReference(extendEncoder, CANSparkMax.ControlType.kPosition);
   }
+
+  public double getExtendPosition() {
+    return extendEncoder.getPosition();
+  }
+
   public boolean getIsAtHigh() {
     return highExtremeDigitalInput.get();
   }
@@ -62,10 +74,10 @@ public class ArmExtendSubsystem extends SubsystemBase {
   public void zeroPos() {
     extendEncoder.setPosition(0.0);
   }
-
   
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Extend Pos", getExtendPosition());
   }
 }

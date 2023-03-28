@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.ArmCommands.AutoArmCommand;
+import frc.robot.commands.DriveCommands.ABV2Command;
 import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsystem;
 import frc.robot.subsystems.Drive.DriveTrainSubsystems;
 
@@ -49,6 +50,7 @@ public class Robot extends TimedRobot {
   private Command autoBalance;
   private Command drive;
   public Command autoArmExtend;
+  public Command balance;
 
   private RobotContainer robotContainer;
   // private final I2C.Port i2cport = I2C.Port.kOnboard;
@@ -67,6 +69,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
     drive = robotContainer.getDriveCommand();
+    balance = robotContainer.getBalance();
 
     // ArmAngleSubsystem armAngleSubsystem = robotContainer.getArmAngleSub();
     // armAngleSubsystem.stopArm();
@@ -94,7 +97,8 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     Limelight.updateValues();
-    
+    Limelight.getX();
+
     // robotContainer.updateOdometry();
   }
 
@@ -102,13 +106,13 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
 
-    DriveTrainSubsystems driveSub = robotContainer.getDriveSub();
-    driveSub.drive(new ChassisSpeeds(1, 0, 0));
+    // DriveTrainSubsystems driveSub = robotContainer.getDriveSub();
+    // driveSub.drive(new ChassisSpeeds(1, 0, 0));
   }
 
   @Override
   public void disabledPeriodic() {
-  
+
     // DriveTrainSubsystems driveSub = robotContainer.getDriveSub();
     // driveSub.drive(new ChassisSpeeds(0, 0, 0));
   }
@@ -120,19 +124,18 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // robotContainer.resetOdo();
-
-    // if (autoBalance != null) {
-    // autoBalance.schedule();
-    // }
-
-    // autoArmExtend = robotContainer.getExtendCommand();
-
     if (drive != null) {
       drive.schedule();
     }
 
+    // if (balance != null) {
+    // balance.schedule();
+    // }
+
+    // autoArmExtend = robotContainer.getExtendCommand();
+
     // if(autoArmExtend != null) {
-    //   autoArmExtend.schedule();
+    // autoArmExtend.schedule();
     // }
 
   }
@@ -150,16 +153,15 @@ public class Robot extends TimedRobot {
     // continue until interrupted by another command, remove
     // this line or comment it out.
 
-    if (autoBalance != null) {
-      autoBalance.cancel();
-    }
-
+    // if(autoKick != null) {
+    // autoKick.cancel();
+    // }
     if (drive != null) {
       drive.cancel();
     }
 
-    // if(autoKick != null) {
-    // autoKick.cancel();
+    // if(balance == null) {
+    // balance.cancel();
     // }
 
   }

@@ -6,6 +6,7 @@ package frc.robot.subsystems.Drive;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Limelight;
 import frc.robot.subsystems.Liberderry.MechanicalConfiguration;
 import frc.robot.subsystems.Liberderry.MkSwerveModuleBuilder;
 import frc.robot.subsystems.Liberderry.MotorType;
@@ -21,6 +22,8 @@ import java.util.function.DoubleSupplier;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -50,7 +53,7 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
   private final TorqueSwerveModule2022 backRightModule;
 
   // @warning may not be right, just to make code work for now
-  public static final double maxVelocityPerSecond = 6380.0 / 60.0 *
+  public static final double maxVelocityPerSecond = 6400.0 / 60.0 *
       SdsModuleConfigurations.MK4_L2.getDriveReduction() *
       SdsModuleConfigurations.MK4_L2.getWheelDiameter() * Math.PI;
 
@@ -59,6 +62,8 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
 
   private double xVelocity;
   private double yVelocity;
+
+  PIDController driveAnglePID = new PIDController(.1, 0, 0);
 
   public DriveTrainSubsystems() {
 
@@ -103,6 +108,10 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
     pidgey.reset();
   }
 
+  public void setHeading(double heading) {
+    pidgey.setYaw(heading);
+  }
+
   public Rotation2d getGyroscopeRotation() {
     // We have to invert the angle of the NavX so that rotating the robot
     // counter-clockwise makes the angle increase.
@@ -111,12 +120,12 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
 
   public void drive(ChassisSpeeds speeds) {
     SwerveModuleState[] states = Constants.m_kinematics.toSwerveModuleStates(speeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, 2.75);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, 2.8);
 
-    frontLeftModule.setDesiredState(states[0]);
-    frontRightModule.setDesiredState(states[1]);
-    backRightModule.setDesiredState(states[2]);
-    backLeftModule.setDesiredState(states[3]);
+    frontLeftModule.setDesiredState(new SwerveModuleState(states[0].speedMetersPerSecond, states[0].angle));
+    frontRightModule.setDesiredState(new SwerveModuleState(states[1].speedMetersPerSecond, states[1].angle));
+    backRightModule.setDesiredState(new SwerveModuleState(states[2].speedMetersPerSecond, states[2].angle));
+    backLeftModule.setDesiredState(new SwerveModuleState(states[3].speedMetersPerSecond, states[3].angle));
     SmartDashboard.putNumber("pigeon rotation :)", pidgey.getRotation2d().getDegrees());
   }
 
@@ -146,6 +155,29 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
             xtrans.getAsDouble(),
             ytrans.getAsDouble(),
             rot.getAsDouble(),
+            getGyroscopeRotation()));
+    xVelocity = xtrans.getAsDouble();
+    yVelocity = ytrans.getAsDouble();
+  }
+
+  public void fieldOrientedDriveNumber(Double xtrans, Double ytrans, Double rot) {
+    drive(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            xtrans,
+            ytrans,
+            rot,
+            getGyroscopeRotation()));
+  }
+
+  public void autoAlignDrive(DoubleSupplier xtrans, DoubleSupplier ytrans) {
+    Limelight.setLeftmost();
+    double rot = driveAnglePID.calculate(Limelight.getX(), -18);
+    SmartDashboard.putNumber("Angle PID Output", rot);
+    drive(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            xtrans.getAsDouble(),
+            ytrans.getAsDouble(),
+            -rot,
             getGyroscopeRotation()));
     xVelocity = xtrans.getAsDouble();
     yVelocity = ytrans.getAsDouble();
@@ -203,7 +235,9 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
   }
 
   public double getYaw() {
-    return pidgey.getYaw();
+    double yaw = pidgey.getYaw();
+    SmartDashboard.putNumber("Yaw", yaw);
+    return yaw;
   }
 
   public SwerveModuleState[] getModuleStates() {

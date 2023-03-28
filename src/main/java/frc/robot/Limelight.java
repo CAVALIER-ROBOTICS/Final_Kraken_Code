@@ -71,12 +71,21 @@ public class Limelight {
 
     public static double getX()
     {
-        return -y;
+        SmartDashboard.putNumber("X", x);
+        return x;
     }
 
     public static double getY()
     {
-        return -x;
+        return y;
+    }
+
+    public static void setLeftmost() {
+        table.getEntry("pipeline").setNumber(1);
+    }
+
+    public static void setRightmost() {
+        table.getEntry("pipeline").setNumber(0);
     }
 
     public static double getArea()

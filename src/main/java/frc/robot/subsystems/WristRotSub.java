@@ -13,11 +13,12 @@ import frc.robot.Constants;
 public class WristRotSub extends SubsystemBase {
   CANSparkMax wristRotMotor = new CANSparkMax(Constants.wristRotID, MotorType.kBrushless);
   /** Creates a new WristRotSub. */
-  public WristRotSub() {}
+  public WristRotSub() {
+    wristRotMotor.enableVoltageCompensation(Constants.NOMINAL_VOLTAGE);
+  }
 
   public void setWrist(double setpoint) {
     wristRotMotor.set(setpoint);
-    wristRotMotor.enableVoltageCompensation(Constants.NOMINAL_VOLTAGE);
   }
 
   @Override
