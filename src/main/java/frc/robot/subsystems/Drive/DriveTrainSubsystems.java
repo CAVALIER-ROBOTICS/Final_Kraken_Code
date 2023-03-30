@@ -41,8 +41,7 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
   // search up Pigeon IMU for more info
   WPI_Pigeon2 pidgey = new WPI_Pigeon2(pigeonID, "OTHERCANIVORE");
   // Odometry class for tracking robot pose
-  // Rotation2d.fromDegrees(getFusedHeading()); getRotation2d()
-  // Rotation2d.fromDegrees(pidgey.getCompassHeading()
+
   private final SwerveDriveOdometry odo;
   public final Field2d field = new Field2d();
 
@@ -249,6 +248,13 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
     double yaw = pidgey.getYaw();
     SmartDashboard.putNumber("Yaw", yaw);
     return yaw;
+  }
+
+  public void setX() {
+    frontLeftModule.setDesiredState(new SwerveModuleState(0.1, Rotation2d.fromDegrees(45.0)));
+    frontRightModule.setDesiredState(new SwerveModuleState(0.1, Rotation2d.fromDegrees(315.0)));
+    backLeftModule.setDesiredState(new SwerveModuleState(0.1, Rotation2d.fromDegrees(315.0)));
+    backRightModule.setDesiredState(new SwerveModuleState(0.1, Rotation2d.fromDegrees(45.0)));
   }
 
   public SwerveModuleState[] getModuleStates() {

@@ -31,9 +31,9 @@ import frc.robot.commands.ArmCommands.ArmInCommand;
 import frc.robot.commands.ArmCommands.ArmOutCommand;
 import frc.robot.commands.DriveCommands.ABV2Command;
 import frc.robot.commands.DriveCommands.FieldDriveCommand;
+import frc.robot.commands.DriveCommands.LockCommand;
 import frc.robot.commands.SetPoints.ExtendScoring;
 import frc.robot.commands.WristCommands.WristCommand;
-import frc.robot.subsystems.TestMotorSub;
 import frc.robot.subsystems.WristRotSub;
 import frc.robot.subsystems.WristSub;
 import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsystem;
@@ -41,49 +41,29 @@ import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
 import frc.robot.subsystems.Drive.DriveTrainSubsystems;
 import frc.robot.subsystems.VacuumSubsystems.VacuumSubsystem;
 
-/**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
- * subsystems, commands, and button mappings) should be declared here.
- */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public static XboxController driver = new XboxController(0);
   public static XboxController operator = new XboxController(1);
   public static NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-cavbots"); // TODO move to
-                                                                                                      // dedicated class
-                                                                                                      // lol
 
-  UsbCamera camera;
-
+  //drive subsystems
   DriveTrainSubsystems driveSub = new DriveTrainSubsystems();
+  DriveAuto driveAuto = new DriveAuto(driveSub);
+  PathPlannerTrajectory path;
+
+  //arm subsystems
   ArmAngleSubsystem armAngleSub = new ArmAngleSubsystem();
   ArmExtendSubsystem armExtendSub = new ArmExtendSubsystem();
 
-  TestMotorSub testSub = new TestMotorSub();
+  VacuumSubsystem vacSub = new VacuumSubsystem();
+
   WristRotSub wristRotSub = new WristRotSub();
-
-  DriveAuto driveAuto = new DriveAuto(driveSub);
-
   WristSub wristSubsystem = new WristSub();
-
-  PathPlannerTrajectory path;
-
-  // Trigger vacTrigger = new Trigger(() -> getRightTrigger(driver));
-  // Trigger armextTrigger = new Trigger(() -> getRightTrigger(operator));
 
   Trigger armIn = new Trigger(() -> getLeftTrigger(operator));
   Trigger armOut = new Trigger(() -> getRightTrigger(operator));
 
-  VacuumSubsystem vacSub = new VacuumSubsystem();
-
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
   public RobotContainer() {
 
     // camera = CameraServer.startAutomaticCapture();
@@ -109,20 +89,13 @@ public class RobotContainer {
     configureButtonBindings();
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
-   * it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
   private void configureButtonBindings() {
 
     table.getEntry("camMode").setNumber(0);
     table.getEntry("ledMode").setNumber(0);
 
-    JoystickButton changeDrive = new JoystickButton(driver, 3);
+    // JoystickButton changeDrive = new JoystickButton(driver, 3);
+    JoystickButton xLock = new JoystickButton(driver, 3);
     JoystickButton babyMode = new JoystickButton(driver, 1);
     JoystickButton resetGyro = new JoystickButton(driver, 4);
 
@@ -138,14 +111,10 @@ public class RobotContainer {
     JoystickButton highScoring = new JoystickButton(operator, 4);
     JoystickButton middleScoring = new JoystickButton(operator, 3);
 
-    //cones
-    highScoring.onTrue(new ExtendScoring(armExtendSub, 1));
-    middleScoring.onTrue(new ExtendScoring(armExtendSub, 2));
-    // highScoring.onTrue(new ExtendScoring(armExtendSub));
+    //DRIVER BUTTONS
 
     alignBot.toggleOnTrue(new RunCommand(() -> driveSub.autoAlignDrive(driver::getLeftY, driver::getLeftX, driver::getRightX, false), driveSub));
     alignBotRightmost.onTrue(new RunCommand(() -> driveSub.autoAlignDrive(driver::getLeftY, driver::getLeftX, driver::getRightX, true), driveSub));
-
 
     alignBot.onFalse( new FieldDriveCommand(
       () -> modifyAxis(driver.getLeftY() *
@@ -174,12 +143,20 @@ public class RobotContainer {
             DriveTrainSubsystems.maxAnglarVelocityPerSecond) * .25),
         driveSub));
 
+    resetGyro.whileTrue(new InstantCommand(driveSub::zeroGyroscope));
+
+    xLock.onTrue(new LockCommand(driveSub));
+
+    //OPERTAOR BUTTONS
+
+    // cones
+    highScoring.onTrue(new ExtendScoring(armExtendSub, 1));
+    middleScoring.onTrue(new ExtendScoring(armExtendSub, 2));
+
     armAngleSub.setDefaultCommand(new SequentialCommandGroup(
         // new HomeArmCommand(armAngleSub),
         new ArmAngleCommand(armAngleSub, operator::getLeftY)));
     // operator::getRightY));
-
-    resetGyro.whileTrue(new InstantCommand(driveSub::zeroGyroscope));
 
     setVacuumCone.toggleOnTrue(new VacuumCommand(vacSub, 1));
     setVacuumCube.toggleOnFalse(new VacuumCommand(vacSub, -1));
@@ -188,14 +165,7 @@ public class RobotContainer {
     armIn.whileTrue(new ArmInCommand(armExtendSub));
 
     wristSubsystem.setDefaultCommand(new WristCommand(wristSubsystem, operator::getRightY));
-
-    changeDrive.toggleOnTrue(
-        new FieldDriveCommand(
-            () -> modifyAxis(driver.getRawAxis(1)),
-            () -> modifyAxis(driver.getRawAxis(0)),
-            () -> modifyAxis(driver.getRawAxis(4)),
-            driveSub));
-
+    
     wristCW.whileTrue(new StartEndCommand(
         () -> wristRotSub.setWrist(.4),
         () -> wristRotSub.setWrist(0),
@@ -206,8 +176,12 @@ public class RobotContainer {
         () -> wristRotSub.setWrist(0),
         wristRotSub));
 
-    // vacTrigger.whileTrue(new ArmExtendCommand(armExtendSub, () ->
-    // getShouldNegate(driver)));
+    // changeDrive.toggleOnTrue(
+    //     new FieldDriveCommand(
+    //         () -> modifyAxis(driver.getRawAxis(1)),
+    //         () -> modifyAxis(driver.getRawAxis(0)),
+    //         () -> modifyAxis(driver.getRawAxis(4)),
+    //         driveSub));
 
     // driveForward.whileTrue(new InstantCommand( () -> driveSub.drive(new
     // ChassisSpeeds(0, 10, 0))));
