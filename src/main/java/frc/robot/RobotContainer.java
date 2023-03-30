@@ -164,6 +164,7 @@ public class RobotContainer {
       () -> modifyAxis(-driver.getRightX() *
           DriveTrainSubsystems.maxAnglarVelocityPerSecond),
       driveSub));
+
     babyMode.toggleOnTrue(new FieldDriveCommand(
         () -> modifyAxis((driver.getLeftY() *
             DriveTrainSubsystems.maxVelocityPerSecond) * .25),
@@ -254,8 +255,7 @@ public class RobotContainer {
 
         new InstantCommand(driveSub::zeroGyroscope),
 
-        //backwards
-        new RunCommand(() -> driveSub.fieldOrientedDriveNumber(0.0, 2.0, 0.0), driveSub).withTimeout(0.56),
+        new RunCommand(() -> driveSub.fieldOrientedDriveNumber(0.0, 2.0, 0.0), driveSub).withTimeout(1),
 
         new InstantCommand(() -> driveSub.drive(new ChassisSpeeds(0, 0, 0))),
 
