@@ -10,7 +10,8 @@ import frc.robot.subsystems.ArmSubsystems.ArmExtendSubsystem;
 public class ExtendScoring extends CommandBase {
   /** Creates a new ExtendCommand. */
     ArmExtendSubsystem armExtendSubsystem;
-    int location;
+    int location = 0;
+ 
 
     public ExtendScoring(ArmExtendSubsystem armSub, int loc) {
       armExtendSubsystem = armSub;
@@ -24,13 +25,15 @@ public class ExtendScoring extends CommandBase {
   public void initialize() {
     switch(location) {
       case 1:
-      //high
-      armExtendSubsystem.zeroPos();
-      armExtendSubsystem.setExtendePosition(70);
-      //middle
-      case -1:
-      armExtendSubsystem.zeroPos();
-      armExtendSubsystem.setExtendePosition(35);
+      // high
+        armExtendSubsystem.zeroPos();
+        armExtendSubsystem.setExtendePosition(60);
+        break;
+      // middle
+      case 2:
+        armExtendSubsystem.zeroPos();
+        armExtendSubsystem.setExtendePosition(10);
+        break;
     }
   }
 

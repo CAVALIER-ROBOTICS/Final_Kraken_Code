@@ -39,10 +39,12 @@ public class VacuumCommand extends CommandBase {
     switch(gamePiece) {
       case 1:
       //cone
-      vacSub.setAll(.5); //.6
+        vacSub.setAll(.5); //.6
+        break;
       //cube
       case -1:
-      vacSub.setAll(.45); //.45
+        vacSub.setAll(.45); //.45
+        break;
     }
   }
 

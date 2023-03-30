@@ -126,8 +126,8 @@ public class RobotContainer {
     JoystickButton babyMode = new JoystickButton(driver, 1);
     JoystickButton resetGyro = new JoystickButton(driver, 4);
 
-    // JoystickButton alignBot = new JoystickButton(driver, 6);
-    // JoystickButton alignBotRightmost = new JoystickButton(driver, 5);
+    JoystickButton alignBot = new JoystickButton(driver, 6);
+    JoystickButton alignBotRightmost = new JoystickButton(driver, 5);
 
     JoystickButton setVacuumCone = new JoystickButton(operator, 2);
     JoystickButton setVacuumCube = new JoystickButton(operator, 1);
@@ -139,12 +139,31 @@ public class RobotContainer {
     JoystickButton middleScoring = new JoystickButton(operator, 3);
 
     //cones
-    highScoring.whileTrue(new ExtendScoring(armExtendSub, 1));
-    middleScoring.whileTrue(new ExtendScoring(armExtendSub, -1));
+    highScoring.onTrue(new ExtendScoring(armExtendSub, 1));
+    middleScoring.onTrue(new ExtendScoring(armExtendSub, 2));
+    // highScoring.onTrue(new ExtendScoring(armExtendSub));
 
-    // alignBotRightmost.whileTrue(new InstantCommand(Limelight::setRightmost));
-    // alignBot.toggleOnTrue(new RunCommand(() -> driveSub.autoAlignDrive(driver::getLeftY, driver::getLeftX), driveSub));
+    alignBot.toggleOnTrue(new RunCommand(() -> driveSub.autoAlignDrive(driver::getLeftY, driver::getLeftX, driver::getRightX, false), driveSub));
+    alignBotRightmost.onTrue(new RunCommand(() -> driveSub.autoAlignDrive(driver::getLeftY, driver::getLeftX, driver::getRightX, true), driveSub));
 
+
+    alignBot.onFalse( new FieldDriveCommand(
+      () -> modifyAxis(driver.getLeftY() *
+          DriveTrainSubsystems.maxVelocityPerSecond),
+      () -> modifyAxis(driver.getLeftX() *
+          DriveTrainSubsystems.maxVelocityPerSecond),
+      () -> modifyAxis(-driver.getRightX() *
+          DriveTrainSubsystems.maxAnglarVelocityPerSecond),
+      driveSub));
+
+     alignBotRightmost.onFalse( new FieldDriveCommand(
+      () -> modifyAxis(driver.getLeftY() *
+            DriveTrainSubsystems.maxVelocityPerSecond),
+      () -> modifyAxis(driver.getLeftX() *
+            DriveTrainSubsystems.maxVelocityPerSecond),
+      () -> modifyAxis(-driver.getRightX() *
+          DriveTrainSubsystems.maxAnglarVelocityPerSecond),
+      driveSub));
     babyMode.toggleOnTrue(new FieldDriveCommand(
         () -> modifyAxis((driver.getLeftY() *
             DriveTrainSubsystems.maxVelocityPerSecond) * .25),
@@ -235,7 +254,8 @@ public class RobotContainer {
 
         new InstantCommand(driveSub::zeroGyroscope),
 
-        new RunCommand(() -> driveSub.fieldOrientedDriveNumber(0.0, 1.0, 0.0), driveSub).withTimeout(1.25),
+        //backwards
+        new RunCommand(() -> driveSub.fieldOrientedDriveNumber(0.0, 2.0, 0.0), driveSub).withTimeout(0.56),
 
         new InstantCommand(() -> driveSub.drive(new ChassisSpeeds(0, 0, 0))),
 

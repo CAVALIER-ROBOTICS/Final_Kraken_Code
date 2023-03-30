@@ -30,9 +30,9 @@ public class ArmExtendSubsystem extends SubsystemBase {
     extendMotor.setIdleMode(IdleMode.kBrake);
     extendMotor.setInverted(true); //I believe it should be inverted??
 
-    extendPID.setP(0.05);
-    extendPID.setI(0.01);
-    extendPID.setD(0.001);
+    extendPID.setP(0.015);
+    extendPID.setI(0.0003);
+    extendPID.setD(0.01);
     
     extendMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
     extendMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);

@@ -63,7 +63,8 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
   private double xVelocity;
   private double yVelocity;
 
-  PIDController driveAnglePID = new PIDController(.1, 0, 0);
+  PIDController driveAnglePID = new PIDController(.01, 0, 0);
+  PIDController drivePID  = new PIDController(.055, 0.001, 0);
 
   public DriveTrainSubsystems() {
 
@@ -169,18 +170,28 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
             getGyroscopeRotation()));
   }
 
-  public void autoAlignDrive(DoubleSupplier xtrans, DoubleSupplier ytrans) {
-    Limelight.setLeftmost();
-    double rot = driveAnglePID.calculate(Limelight.getX(), -18);
-    SmartDashboard.putNumber("Angle PID Output", rot);
-    drive(
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            xtrans.getAsDouble(),
-            ytrans.getAsDouble(),
-            -rot,
-            getGyroscopeRotation()));
-    xVelocity = xtrans.getAsDouble();
-    yVelocity = ytrans.getAsDouble();
+  public void autoAlignDrive(DoubleSupplier xtrans, DoubleSupplier ytrans, DoubleSupplier rotation, boolean targetRightmost) {
+    if(Limelight.hasTarget()) {
+        double offset = 0;
+      if(targetRightmost) {
+        Limelight.setRightmost();
+        offset = -17;
+      } else {
+        Limelight.setLeftmost();
+        offset = 0;
+      }
+      double drive = drivePID.calculate(Limelight.getX(), offset);
+      // double rot = driveAnglePID.calculate(Limelight.getX(), offset);
+      // SmartDashboard.putNumber("Angle PID Output", rot);
+      drive(
+          ChassisSpeeds.fromFieldRelativeSpeeds(
+              xtrans.getAsDouble(),
+              -drive,
+              rotation.getAsDouble(),
+              getGyroscopeRotation()));
+      xVelocity = xtrans.getAsDouble();
+      yVelocity = ytrans.getAsDouble();
+    }
   }
 
   public void robotOrientedDrive(double xtrans, double ytrans, double rot) {
