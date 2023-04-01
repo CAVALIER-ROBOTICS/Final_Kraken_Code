@@ -34,6 +34,7 @@ import frc.robot.commands.ArmCommands.ArmOutCommand;
 import frc.robot.commands.DriveCommands.ABV2Command;
 import frc.robot.commands.DriveCommands.FieldDriveCommand;
 import frc.robot.commands.DriveCommands.LockCommand;
+import frc.robot.commands.DriveCommands.RedAlliance;
 import frc.robot.subsystems.WristRotSub;
 import frc.robot.subsystems.WristSub;
 import frc.robot.subsystems.ArmSubsystems.ArmAngleSubsystem;
@@ -47,12 +48,12 @@ public class RobotContainer {
   public static XboxController operator = new XboxController(1);
   public static NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-cavbots"); // TODO move to
 
-  //drive subsystems
+  // drive subsystems
   DriveTrainSubsystems driveSub = new DriveTrainSubsystems();
   DriveAuto driveAuto = new DriveAuto(driveSub);
   PathPlannerTrajectory path;
 
-  //arm subsystems
+  // arm subsystems
   ArmAngleSubsystem armAngleSub = new ArmAngleSubsystem();
   ArmExtendSubsystem armExtendSub = new ArmExtendSubsystem();
 
@@ -83,7 +84,7 @@ public class RobotContainer {
             () -> modifyAxis(driver.getLeftX() *
                 DriveTrainSubsystems.maxVelocityPerSecond),
             () -> modifyAxis(-driver.getRightX() *
-                DriveTrainSubsystems.maxAnglarVelocityPerSecond),
+                DriveTrainSubsystems.maxAnglarVelocityPerSecond * .75),
             driveSub));
 
     configureButtonBindings();
@@ -111,43 +112,45 @@ public class RobotContainer {
     JoystickButton highScoring = new JoystickButton(operator, 4);
     JoystickButton middleScoring = new JoystickButton(operator, 3);
 
-    //DRIVER BUTTONS
+    // DRIVER BUTTONS
 
-    alignBot.toggleOnTrue(new RunCommand(() -> driveSub.autoAlignDrive(driver::getLeftY, driver::getLeftX, driver::getRightX, false), driveSub));
-    alignBotRightmost.onTrue(new RunCommand(() -> driveSub.autoAlignDrive(driver::getLeftY, driver::getLeftX, driver::getRightX, true), driveSub));
+    alignBot.toggleOnTrue(new RunCommand(
+        () -> driveSub.autoAlignDrive(driver::getLeftY, driver::getLeftX, driver::getRightX, false), driveSub));
+    alignBotRightmost.onTrue(new RunCommand(
+        () -> driveSub.autoAlignDrive(driver::getLeftY, driver::getLeftX, driver::getRightX, true), driveSub));
 
-    alignBot.onFalse( new FieldDriveCommand(
-      () -> modifyAxis(driver.getLeftY() *
-          DriveTrainSubsystems.maxVelocityPerSecond),
-      () -> modifyAxis(driver.getLeftX() *
-          DriveTrainSubsystems.maxVelocityPerSecond),
-      () -> modifyAxis(-driver.getRightX() *
-          DriveTrainSubsystems.maxAnglarVelocityPerSecond),
-      driveSub));
-
-     alignBotRightmost.onFalse( new FieldDriveCommand(
-      () -> modifyAxis(driver.getLeftY() *
+    alignBot.onFalse(new FieldDriveCommand(
+        () -> modifyAxis(driver.getLeftY() *
             DriveTrainSubsystems.maxVelocityPerSecond),
-      () -> modifyAxis(driver.getLeftX() *
+        () -> modifyAxis(driver.getLeftX() *
             DriveTrainSubsystems.maxVelocityPerSecond),
-      () -> modifyAxis(-driver.getRightX() *
-          DriveTrainSubsystems.maxAnglarVelocityPerSecond),
-      driveSub));
+        () -> modifyAxis(-driver.getRightX() *
+            DriveTrainSubsystems.maxAnglarVelocityPerSecond),
+        driveSub));
+
+    alignBotRightmost.onFalse(new FieldDriveCommand(
+        () -> modifyAxis(driver.getLeftY() *
+            DriveTrainSubsystems.maxVelocityPerSecond),
+        () -> modifyAxis(driver.getLeftX() *
+            DriveTrainSubsystems.maxVelocityPerSecond),
+        () -> modifyAxis(-driver.getRightX() *
+            DriveTrainSubsystems.maxAnglarVelocityPerSecond),
+        driveSub));
 
     babyMode.toggleOnTrue(new FieldDriveCommand(
         () -> modifyAxis((driver.getLeftY() *
-            DriveTrainSubsystems.maxVelocityPerSecond) * .25),
+            DriveTrainSubsystems.maxVelocityPerSecond) * .24),
         () -> modifyAxis((driver.getLeftX() *
-            DriveTrainSubsystems.maxVelocityPerSecond) * .20),
+            DriveTrainSubsystems.maxVelocityPerSecond) * .21),
         () -> modifyAxis(-(driver.getRightX() *
-            DriveTrainSubsystems.maxAnglarVelocityPerSecond) * .25),
+            DriveTrainSubsystems.maxAnglarVelocityPerSecond) * .20),
         driveSub));
 
     resetGyro.whileTrue(new InstantCommand(driveSub::zeroGyroscope));
 
-    xLock.onTrue(new LockCommand(driveSub));
+    xLock.toggleOnTrue(new LockCommand(driveSub));
 
-    //OPERTAOR BUTTONS
+    // OPERTAOR BUTTONS
 
     // cones
     highScoring.onTrue(new ExtendScoring(armExtendSub, 1));
@@ -165,7 +168,7 @@ public class RobotContainer {
     armIn.whileTrue(new ArmInCommand(armExtendSub));
 
     wristSubsystem.setDefaultCommand(new WristCommand(wristSubsystem, operator::getRightY));
-    
+
     wristCW.whileTrue(new StartEndCommand(
         () -> wristRotSub.setWrist(.4),
         () -> wristRotSub.setWrist(0),
@@ -177,11 +180,11 @@ public class RobotContainer {
         wristRotSub));
 
     // changeDrive.toggleOnTrue(
-    //     new FieldDriveCommand(
-    //         () -> modifyAxis(driver.getRawAxis(1)),
-    //         () -> modifyAxis(driver.getRawAxis(0)),
-    //         () -> modifyAxis(driver.getRawAxis(4)),
-    //         driveSub));
+    // new FieldDriveCommand(
+    // () -> modifyAxis(driver.getRawAxis(1)),
+    // () -> modifyAxis(driver.getRawAxis(0)),
+    // () -> modifyAxis(driver.getRawAxis(4)),
+    // driveSub));
 
     // driveForward.whileTrue(new InstantCommand( () -> driveSub.drive(new
     // ChassisSpeeds(0, 10, 0))));
@@ -226,22 +229,26 @@ public class RobotContainer {
 
   public Command getDriveCommand() {
     return new SequentialCommandGroup(
+        new InstantCommand(driveSub::zeroGyroscope),
+        new RunCommand(() -> driveSub.fieldOrientedDriveNumber(-1.0, 0.0, 0.0), driveSub).withTimeout(1),
+        new InstantCommand(() -> driveSub.drive(new ChassisSpeeds(0, 0, 0))),
+        new RedAlliance(driveSub), //Swap to ABV2Command if charge station is good (blue)
+        new LockCommand(driveSub)
+    );
+  }
+
+  public Command getDriveArmCommand() {
+    return new SequentialCommandGroup(
+        // new RunCommand(() -> armAngleSub.setAnglePosition(30)).withTimeout(1),
+
+        // new InstantCommand(() -> armAngleSub.setPercentage(0)),
 
         new InstantCommand(driveSub::zeroGyroscope),
 
-        new RunCommand(() -> driveSub.fieldOrientedDriveNumber(0.0, 2.0, 0.0), driveSub).withTimeout(1),
+        // backward facing
+        new RunCommand(() -> driveSub.fieldOrientedDriveNumber(1.0, 0.0, 0.0), driveSub).withTimeout(2.5),
 
-        new InstantCommand(() -> driveSub.drive(new ChassisSpeeds(0, 0, 0))),
-
-        new ABV2Command(driveSub)
-
-    // new StartEndCommand(() -> driveSub.drive(new ChassisSpeeds(1.5, 0, 0)),
-    // () -> driveSub.drive(new ChassisSpeeds(0, 0, 0)),
-    // driveSub).withTimeout(4),
-
-    // new ABCommand(driveSub)
-
-    );
+        new InstantCommand(() -> driveSub.drive(new ChassisSpeeds(0, 0, 0))));
   }
 
   public Command getAutoDrive() {

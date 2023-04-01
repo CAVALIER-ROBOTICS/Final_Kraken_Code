@@ -219,6 +219,11 @@ public final class TorqueSwerveModule2022 extends TorqueSwerveModule {
     }
 
     @Override
+    public void setOpenLoopRampRate(double l) {
+        drive.configOpenloopRamp(l);
+    }
+
+    @Override
     public Rotation2d getRotation() {
         return Rotation2d.fromRadians(getTurnEncoder());
     }

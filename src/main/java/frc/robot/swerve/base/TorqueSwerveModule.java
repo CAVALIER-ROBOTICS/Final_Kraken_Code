@@ -23,6 +23,8 @@ public abstract class TorqueSwerveModule {
         return id;
     }
 
+    public abstract void setOpenLoopRampRate(double loop);
+
     public abstract void setDesiredState(final SwerveModuleState state);
 
     public abstract SwerveModuleState getState();

@@ -4,36 +4,45 @@
 
 package frc.robot.commands.DriveCommands;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Drive.DriveTrainConstants;
 import frc.robot.subsystems.Drive.DriveTrainSubsystems;
 
-public class LockCommand extends CommandBase {
-  /** Creates a new LockCommand. */
+public class RedAlliance extends CommandBase {
+  /** Creates a new RedAlliance. */
   public DriveTrainSubsystems driveSub;
+  public PIDController pid = new PIDController(.055, 0.0, 0.01);
 
-  public LockCommand(DriveTrainSubsystems dSub) {
+  public RedAlliance(DriveTrainSubsystems dSub) {
     // Use addRequirements() here to declare subsystem dependencies.
     driveSub = dSub;
-    addRequirements(dSub);
+    addRequirements(driveSub);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    driveSub.setX();
+    double correction = pid.calculate(driveSub.getPitch() + driveSub.getRoll(), 0);
+    driveSub.fieldOrientedDriveNumber(correction, 0.0, 0.0);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    driveSub.stop();
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return (driveSub.getPitch() + driveSub.getRoll()) < 1;
+    // return false;
   }
 }

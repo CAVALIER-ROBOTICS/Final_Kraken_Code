@@ -100,6 +100,13 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
         backRightModule.getPosition(), backLeftModule.getPosition() };
   }
 
+  public void setDriveRampRate(double ls) {
+    frontLeftModule.setOpenLoopRampRate(ls);
+    frontRightModule.setOpenLoopRampRate(ls);
+    backLeftModule.setOpenLoopRampRate(ls);
+    backRightModule.setOpenLoopRampRate(ls);
+  }
+
   public SwerveModulePosition getPos(SwerveModule state) {
     return state.getPosition();
   }
@@ -120,11 +127,11 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
 
   public void drive(ChassisSpeeds speeds) {
     SwerveModuleState[] states = Constants.m_kinematics.toSwerveModuleStates(speeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, 2.8);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, 2.85);
 
-    frontLeftModule.setDesiredState(new SwerveModuleState(states[0].speedMetersPerSecond, states[0].angle));
-    frontRightModule.setDesiredState(new SwerveModuleState(states[1].speedMetersPerSecond, states[1].angle));
-    backRightModule.setDesiredState(new SwerveModuleState(states[2].speedMetersPerSecond, states[2].angle));
+    frontLeftModule.setDesiredState(new SwerveModuleState(-states[0].speedMetersPerSecond, states[0].angle));
+    frontRightModule.setDesiredState(new SwerveModuleState(-states[1].speedMetersPerSecond, states[1].angle));
+    backRightModule.setDesiredState(new SwerveModuleState(-states[2].speedMetersPerSecond, states[2].angle));
     backLeftModule.setDesiredState(new SwerveModuleState(states[3].speedMetersPerSecond, states[3].angle));
     SmartDashboard.putNumber("pigeon rotation :)", pidgey.getRotation2d().getDegrees());
   }
@@ -171,23 +178,21 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
 
   public void autoAlignDrive(DoubleSupplier xtrans, DoubleSupplier ytrans, DoubleSupplier rotation, boolean targetRightmost) {
     if(Limelight.hasTarget()) {
-        double offset = 0;
+      double offset = -17;
       if(targetRightmost) {
         Limelight.setRightmost();
-        offset = -17;
       } else {
         Limelight.setLeftmost();
-        offset = 0;
       }
       double drive = drivePID.calculate(Limelight.getX(), offset);
       // double rot = driveAnglePID.calculate(Limelight.getX(), offset);
       // SmartDashboard.putNumber("Angle PID Output", rot);
       drive(
-          ChassisSpeeds.fromFieldRelativeSpeeds(
+         new ChassisSpeeds(
               xtrans.getAsDouble(),
               -drive,
-              rotation.getAsDouble(),
-              getGyroscopeRotation()));
+              rotation.getAsDouble()));
+
       xVelocity = xtrans.getAsDouble();
       yVelocity = ytrans.getAsDouble();
     }
@@ -251,10 +256,10 @@ public class DriveTrainSubsystems extends SubsystemBase implements DriveTrainCon
   }
 
   public void setX() {
-    frontLeftModule.setDesiredState(new SwerveModuleState(0.1, Rotation2d.fromDegrees(45.0)));
-    frontRightModule.setDesiredState(new SwerveModuleState(0.1, Rotation2d.fromDegrees(315.0)));
-    backLeftModule.setDesiredState(new SwerveModuleState(0.1, Rotation2d.fromDegrees(315.0)));
-    backRightModule.setDesiredState(new SwerveModuleState(0.1, Rotation2d.fromDegrees(45.0)));
+    frontLeftModule.setDesiredState(new SwerveModuleState(0.0, Rotation2d.fromDegrees(45.0)));
+    frontRightModule.setDesiredState(new SwerveModuleState(0.0, Rotation2d.fromDegrees(315.0)));
+    backLeftModule.setDesiredState(new SwerveModuleState(0.0, Rotation2d.fromDegrees(315.0)));
+    backRightModule.setDesiredState(new SwerveModuleState(0.0, Rotation2d.fromDegrees(45.0)));
   }
 
   public SwerveModuleState[] getModuleStates() {

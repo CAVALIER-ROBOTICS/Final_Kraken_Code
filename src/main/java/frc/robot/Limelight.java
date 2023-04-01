@@ -81,11 +81,11 @@ public class Limelight {
     }
 
     public static void setLeftmost() {
-        table.getEntry("pipeline").setNumber(1);
+        table.getEntry("pipeline").setNumber(0);
     }
 
     public static void setRightmost() {
-        table.getEntry("pipeline").setNumber(0);
+        table.getEntry("pipeline").setNumber(1);
     }
 
     public static double getArea()

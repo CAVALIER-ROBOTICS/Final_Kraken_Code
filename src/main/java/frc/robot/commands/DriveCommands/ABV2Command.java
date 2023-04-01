@@ -7,6 +7,7 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.subsystems.Drive.DriveTrainSubsystems;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -18,6 +19,7 @@ public class ABV2Command extends CommandBase {
   private double error;
   private double currentAngle;
   private double drivePower;
+  private Timer timer = new Timer();
 
   /**
    * Command to use Gyro data to resist the tip angle from the beam - to stabalize
@@ -31,6 +33,7 @@ public class ABV2Command extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    timer.reset();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -40,23 +43,26 @@ public class ABV2Command extends CommandBase {
     // controller joystick
     // Double currentAngle = -1 *
     // Robot.controller.getRawAxis(Constants.LEFT_VERTICAL_JOYSTICK_AXIS) * 45;
-    this.currentAngle = m_DriveSubsystem.getPitch();
+    this.currentAngle = m_DriveSubsystem.getRoll() + m_DriveSubsystem.getPitch();
+    SmartDashboard.putNumber("RollPitch", currentAngle);
 
     error = 0 - currentAngle;
     drivePower = -Math.min(.05 * error, 1);
 
     // Our robot needed an extra push to drive up in reverse, probably due to weight
     // imbalances
+
     if (drivePower < 0) {
       drivePower *= 2;
     }
+    // drivePower *= 2;
 
     // Limit the max power
     if (Math.abs(drivePower) > .8) {
       drivePower = Math.copySign(0.8, drivePower);
     }
 
-    m_DriveSubsystem.fieldOrientedDriveNumber(0.0, -drivePower, 0.0);
+    m_DriveSubsystem.fieldOrientedDriveNumber(-drivePower, 0.0, 0.0);
 
     SmartDashboard.putNumber("Current Angle", currentAngle);
   }
@@ -65,6 +71,7 @@ public class ABV2Command extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_DriveSubsystem.stop();
+    timer.stop();
   }
 
   // Returns true when the command should end.

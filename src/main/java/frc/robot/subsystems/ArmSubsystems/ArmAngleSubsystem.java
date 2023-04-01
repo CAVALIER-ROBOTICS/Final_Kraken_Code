@@ -55,10 +55,10 @@ public class ArmAngleSubsystem extends SubsystemBase {
   }
 
   public void setAnglePosition(double setpoint) {
-    anglePIDLeft.setP(.04); //.02
+    anglePIDLeft.setP(.0001); //.02
     anglePIDLeft.setI(0.0001); //0.0001
     anglePIDLeft.setD(0);
-    anglePIDLeft.setFF(.0004); 
+    anglePIDLeft.setFF(0); 
     
     double encoderRot = (setpoint + 10) / Constants.ARM_MAX * 50;
     anglePIDLeft.setReference(encoderRot, CANSparkMax.ControlType.kPosition);

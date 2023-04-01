@@ -25,26 +25,26 @@ public interface DriveTrainConstants {
   public static final int frontLeftDriveMotor = 1; // FIXME Set front left module drive motor ID
   public static final int frontLeftSteerMotor = 2; // FIXME Set front left module steer motor ID
   public static final int frontLeftSteerEncoder = 52; // FIXME Set front left steer encoder ID
-  public static final double frontLeftModuleSteerOffset = -3.049573041984829; // FIXME Measure and set front left
+  public static final double frontLeftModuleSteerOffset = 0.179475389420986; // FIXME Measure and set front left
   // steer offset
 
   public static final int frontRightDriveMotor = 3; // FIXME Set front right drive motor ID
   public static final int frontRightSteerMotor = 4; // FIXME Set front right steer motor ID
   public static final int frontRightSteerEncoder = 51; // FIXME Set front right steer encoder ID
-  public static final double frontRightModuleSteerOffset = 1.391317762434483; // FIXME Measure and set front right
+  public static final double frontRightModuleSteerOffset = -1.705795888100759; // FIXME Measure and set front right
   // steer offset
 
   public static final int backLeftDriveMotor = 7; // FIXME Set back left drive motor ID
   public static final int backLeftSteerMotor = 8; // FIXME Set back left steer motor ID
   public static final int backLeftSteerEncoder = 53; // FIXME Set back left steer encoder ID
-  public static final double backLeftModuleSteerOffset = -0.955680798982279;
+  public static final double backLeftModuleSteerOffset = -1.029311727975504;
   // steer
   // offset
 
   public static final int backRightDriveMotor = 5; // FIXME Set back right drive motor ID
   public static final int backRightSteerMotor = 6; // FIXME Set back right steer motor ID
   public static final int backRightSteerEncoder = 50; // FIXME Set back right steer encoder ID
-  public static final double backRightModuleSteerOffset = -2.911540449637954; // FIXME Measure and set back
+  public static final double backRightModuleSteerOffset = 0.28225189447403; // FIXME Measure and set back
   // right steer offset
 
   public static final int volts = 12;

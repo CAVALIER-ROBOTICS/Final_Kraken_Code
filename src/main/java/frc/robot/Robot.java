@@ -47,12 +47,13 @@ import frc.robot.subsystems.Drive.DriveTrainSubsystems;
  * project.
  */
 public class Robot extends TimedRobot {
-  private Command autoBalance;
-  private Command drive;
-  public Command autoArmExtend;
-  public Command balance;
+  // private Command autoBalance;
+  private Command driveFlick;
+  // public Command autoArmExtend;
+  public Command driveBalance;
 
   private RobotContainer robotContainer;
+  DriveTrainSubsystems dSub;
   // private final I2C.Port i2cport = I2C.Port.kOnboard;
   // ColorSensorV3 colorSensorV3 = new ColorSensorV3(i2cport);
   // private final ColorMatch cMatch = new ColorMatch();
@@ -68,11 +69,16 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
-    drive = robotContainer.getDriveCommand();
-    balance = robotContainer.getBalance();
 
-    // ArmAngleSubsystem armAngleSubsystem = robotContainer.getArmAngleSub();
-    // armAngleSubsystem.stopArm();
+    //(taxi in other words)
+    driveFlick = robotContainer.getDriveArmCommand();
+    dSub = robotContainer.driveSub;
+
+    //balances!
+    driveBalance = robotContainer.getDriveCommand();
+
+    ArmAngleSubsystem armAngleSubsystem = robotContainer.armAngleSub;
+    armAngleSubsystem.stopArm();
   }
 
   /**
@@ -112,6 +118,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    DriveTrainSubsystems dSub = robotContainer.driveSub;
+
 
     // DriveTrainSubsystems driveSub = robotContainer.getDriveSub();
     // driveSub.drive(new ChassisSpeeds(0, 0, 0));
@@ -123,13 +131,16 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    dSub.setDriveRampRate(0.0);
     // robotContainer.resetOdo();
-    if (drive != null) {
-      drive.schedule();
+
+  //works!!
+    if (driveBalance != null) {
+      driveBalance.schedule();
     }
 
-    // if (balance != null) {
-    // balance.schedule();
+    // if (driveFlick != null) {
+    //   driveFlick.schedule();
     // }
 
     // autoArmExtend = robotContainer.getExtendCommand();
@@ -153,15 +164,18 @@ public class Robot extends TimedRobot {
     // continue until interrupted by another command, remove
     // this line or comment it out.
 
-    // if(autoKick != null) {
-    // autoKick.cancel();
-    // }
-    if (drive != null) {
-      drive.cancel();
+    ArmAngleSubsystem armAngleSubsystem = robotContainer.armAngleSub;
+    armAngleSubsystem.stopArm();
+
+    dSub.setDriveRampRate(.25);
+
+  //works!!!
+    if (driveBalance != null) {
+      driveBalance.cancel();
     }
 
-    // if(balance == null) {
-    // balance.cancel();
+    // if (driveFlick != null) {
+    //   driveFlick.cancel();
     // }
 
   }
